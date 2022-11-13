@@ -1,8 +1,0 @@
-Approach to SAT:
-* vectorized bitwise ops to build satisfiability tables
-	* 8b at first, then up to 16b, maybe 24b if sufficiently sparse
-* local searches
-* clause commutativity
-* clause canonicalization
-* variable equivalence/antiequivalence
-
