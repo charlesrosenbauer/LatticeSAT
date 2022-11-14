@@ -82,6 +82,10 @@ typedef struct{
 	
 	Stack*			stack;
 	int				sfill, ssize;
+	
+	
+	uint64_t*		vals;
+	uint64_t*		sets;
 }SolverState;
 
 

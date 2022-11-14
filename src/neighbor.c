@@ -434,16 +434,10 @@ SolverState makeSolverState(SATTable stab){
 		ret.enttab[i] = stab.hoods[i].entropy;
 	}
 	
-	// Bit remap
-	ret.bitmap	= malloc(sizeof(uint64_t) * stab.hoodct * 2);
-	ret.mfill	= stab.hoodct;
-	ret.msize	= stab.hoodct * 2;
-	for(int i = 0; i < ret.mfill; i++) ret.bitmap[i] = i;
-	
-	// Stack
-	ret.stack	= malloc(sizeof(Stack) * 1024);
-	ret.sfill	= 0;
-	ret.ssize	= 1024;
+	int size  = (stab.inst.varct / 64) + ((stab.inst.varct % 64) != 0);
+	ret.vals  = malloc(sizeof(uint64_t) * size);
+	ret.sets  = malloc(sizeof(uint64_t) * size);
+	for(int i = 0; i < size; i++) ret.sets[i] = 0;
 	
 	return ret;
 }
@@ -496,6 +490,7 @@ int newBitmap(SolverState* s){
 int solverStep(SolverState* solver){
 	int minent = 1024;
 	int minidx = 0;
+	/*
 	for(int i = 0; i < solver->mfill; i++){
 		int ent = solver->enttab[solver->bitmap[i]];
 		if(ent < minent){
@@ -503,7 +498,7 @@ int solverStep(SolverState* solver){
 			minidx = i;
 		}
 	}
-	if(minent == 0) return 0;
+	if(minent == 0) return 0;*/
 	
 	/*
 		TODO:
