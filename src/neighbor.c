@@ -434,55 +434,11 @@ SolverState makeSolverState(SATTable stab){
 		ret.enttab[i] = stab.hoods[i].entropy;
 	}
 	
-	int size  = (stab.inst.varct / 64) + ((stab.inst.varct % 64) != 0);
-	ret.vals  = malloc(sizeof(uint64_t) * size);
-	ret.sets  = malloc(sizeof(uint64_t) * size);
-	for(int i = 0; i < size; i++) ret.sets[i] = 0;
-	
+	int solsize		= (stab.inst.varct / 64) + ((stab.inst.varct % 64) != 0);
+	ret.solution	= malloc(sizeof(uint64_t) * solsize);
+	ret.solset		= malloc(sizeof(uint64_t) * solsize);
+	ret.solfill		= 0;;
 	return ret;
-}
-
-
-int newStackFrame(SolverState* s){
-	if(s->sfill+5 >= s->ssize){
-		Stack* tmp = s->stack;
-		s->stack   = malloc(sizeof(Stack) * s->ssize * 2);
-		for(int i  = 0; i < s->sfill; i++) s->stack[i] = tmp[i];
-		s->ssize  *= 2;
-		free(tmp);
-	}
-	s->sfill++;
-	return s->sfill-1;
-}
-
-
-int newBitTab(SolverState* s){
-	if(s->bfill+5 >= s->bsize){
-		Bit1024* tmp = s->bittab;
-		uint16_t* et = s->enttab;
-		s->bittab    = malloc(sizeof(Bit1024 ) * s->bsize * 2);
-		s->enttab	 = malloc(sizeof(uint16_t) * s->bsize * 2);
-		for(int i    = 0; i < s->bfill; i++) s->bittab[i] = tmp[i];
-		for(int i	 = 0; i < s->bfill; i++) s->enttab[i] = et [i];
-		s->bsize    *= 2;
-		free(tmp);
-		free(et );
-	}
-	s->bfill++;
-	return s->bfill-1;
-}
-
-
-int newBitmap(SolverState* s){
-	if(s->mfill+5 >= s->msize){
-		uint64_t* tmp = s->bitmap;
-		s->bitmap     = malloc(sizeof(uint64_t) * s->bsize * 2);
-		for(int i     = 0; i < s->mfill; i++) s->bitmap[i] = tmp[i];
-		s->msize     *= 2;
-		free(tmp);
-	}
-	s->mfill++;
-	return s->mfill-1;
 }
 
 
@@ -490,15 +446,6 @@ int newBitmap(SolverState* s){
 int solverStep(SolverState* solver){
 	int minent = 1024;
 	int minidx = 0;
-	/*
-	for(int i = 0; i < solver->mfill; i++){
-		int ent = solver->enttab[solver->bitmap[i]];
-		if(ent < minent){
-			minent = ent;
-			minidx = i;
-		}
-	}
-	if(minent == 0) return 0;*/
 	
 	/*
 		TODO:
@@ -513,6 +460,8 @@ int solverStep(SolverState* solver){
 		* per-variable bias
 		* propagation/collapse code
 	*/
+	
+	printf("====STEP: [%i/%i]====\n", solver->solfill, solver->stab.inst.varct);
 	
 	
 	return 1;

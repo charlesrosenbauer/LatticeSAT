@@ -76,16 +76,10 @@ typedef struct{
 	uint16_t*		enttab;
 	int				bfill, bsize;
 	
-	// We may eventually support additional neighborhoods being added during solving
-	uint64_t*		bitmap;
-	int				mfill, msize;
 	
-	Stack*			stack;
-	int				sfill, ssize;
-	
-	
-	uint64_t*		vals;
-	uint64_t*		sets;
+	uint64_t*		solution;
+	uint64_t*		solset;
+	int				solfill;
 }SolverState;
 
 

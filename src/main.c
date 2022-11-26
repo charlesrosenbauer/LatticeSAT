@@ -11,8 +11,8 @@
 
 int main(){
 
-	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Surface* screen = SDL_SetVideoMode(1024, 1024, 32, 0);
+	//SDL_Init(SDL_INIT_EVERYTHING);
+	//SDL_Surface* screen = SDL_SetVideoMode(1024, 1024, 32, 0);
 
 	int pct = 32;
 	Instance inst = randomInstance(pct, pct*4);
@@ -33,7 +33,7 @@ int main(){
 		cont = 0;
 	}
 	
-	
+	/*
 	Point* ps = alloca(sizeof(Point) * pct);
 	scatterPoints(&inst, ps, pct);
 	
@@ -49,6 +49,6 @@ int main(){
 		SDL_Flip(screen);
 		SDL_Delay(30);
 	}
-	SDL_Quit();
+	SDL_Quit();*/
 	
 }
