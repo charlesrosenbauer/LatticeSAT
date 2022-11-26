@@ -109,16 +109,42 @@ int getLocalSuperposition(Bit1024 bt, int v){
 	uint64_t a = 0, b = 0;
 	if(v < 6){
 		for(int i = 0; i < 16; i++){
-			a |= bt.bits[i] & ms[v];
-			b |= bt.bits[i] & ms[v];
+			a |= bt.bits[i] &  ms[v];
+			b |= bt.bits[i] & ~ms[v];
 		}
 	}else{
-		for(int i = 0; i < 16; i++) a |= (ms[v-6] & (1 << i))? ms[6] : 0;
-		for(int i = 0; i < 16; i++) b |= (ms[v-6] & (1 << i))? ms[6] : 0;
+		for(int i = 0; i < 16; i++) a |=   (ms[v-6] & (1 << i))? ms[6] : 0 ;
+		for(int i = 0; i < 16; i++) b |= ~((ms[v-6] & (1 << i))? ms[6] : 0);
 	}
 	a = a? 1 : 0;
 	b = b? 2 : 0;
 	return a | b;
+}
+
+
+int localCollapse(Bit1024* bt, int v, int dir){
+	uint64_t ms[8];
+	ms[0] = 0x5555555555555555;
+	ms[1] = 0x3333333333333333;
+	ms[2] = 0x0f0f0f0f0f0f0f0f;
+	ms[3] = 0x00ff00ff00ff00ff;
+	ms[4] = 0x0000ffff0000ffff;
+	ms[5] = 0x00000000ffffffff;
+	ms[6] = 0xffffffffffffffff;
+	ms[7] = 0x0000000000000000;
+	
+	if(v < 6){
+		if(dir)
+			for(int i = 0; i < 16; i++) bt->bits[i] &=  ms[v];
+		else
+			for(int i = 0; i < 16; i++) bt->bits[i] &= ~ms[v];
+	}else{
+		if(dir)
+			for(int i = 0; i < 16; i++) bt->bits[i] &=   (ms[v-6] & (1 << i))? ms[6] : 0;
+		else
+			for(int i = 0; i < 16; i++) bt->bits[i] &= ~((ms[v-6] & (1 << i))? ms[6] : 0);
+	}
+	return 1;
 }
 
 
