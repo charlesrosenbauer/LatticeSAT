@@ -6,6 +6,35 @@
 
 
 
+IntStack makeStack(int size){
+	IntStack ret;
+	ret.stk  = malloc(sizeof(int) * size);
+	ret.size = size;
+	ret.fill = 0;
+	return ret;
+}
+
+
+int	pushStack(IntStack* stk, int val){
+	if(stk->fill+5 >= stk->size){
+		int* tmp    = stk->stk;
+		stk->size  *= 2;
+		stk->stk    = malloc(sizeof(int) * stk->size);
+		for(int i   = 0; i < stk->fill; i++) stk->stk[i] = tmp[i];
+		free(tmp);
+	}
+	stk->stk[stk->fill] = val;
+	stk->fill++;
+	return stk->fill-1;
+}
+
+
+int	popStack(IntStack* stk){
+	stk->fill--;
+	return stk->stk[stk->fill];
+}
+
+
 
 uint64_t RNGSTATEA = 3189571098710891;
 uint64_t RNGSTATEB = 8930819035719833;

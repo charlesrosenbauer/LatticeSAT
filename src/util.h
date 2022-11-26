@@ -6,6 +6,16 @@
 
 
 typedef struct{
+	int*		stk;
+	int			fill, size;
+}IntStack;
+
+IntStack	makeStack		(int);
+int			pushStack		(IntStack*, int);
+int			popStack		(IntStack*);
+
+
+typedef struct{
 	uint64_t	x, y;
 }Bloom128;
 
