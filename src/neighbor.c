@@ -70,19 +70,19 @@ Bit1024 filterByClause(Bit1024 bt, int a, int b, int c, uint8_t flip){
 	if(a < 6){
 		for(int i = 0; i < 16; i++) ax.bits[i] = ms[a];
 	}else{
-		for(int i = 0; i < 16; i++) ax.bits[i] = (ms[a-6] & (1 << i))? 0xffffffffffffffff : 0;
+		for(int i = 0; i < 16; i++) ax.bits[i] = (ms[a-6] & (1 << i))? ms[6] : 0;
 	}
 	
 	if(b < 6){
 		for(int i = 0; i < 16; i++) bx.bits[i] = ms[b];
 	}else{
-		for(int i = 0; i < 16; i++) bx.bits[i] = (ms[b-6] & (1 << i))? 0xffffffffffffffff : 0;
+		for(int i = 0; i < 16; i++) bx.bits[i] = (ms[b-6] & (1 << i))? ms[6] : 0;
 	}
 	
 	if(c < 6){
 		for(int i = 0; i < 16; i++) cx.bits[i] = ms[c];
 	}else{
-		for(int i = 0; i < 16; i++) cx.bits[i] = (ms[c-6] & (1 << i))? 0xffffffffffffffff : 0;
+		for(int i = 0; i < 16; i++) cx.bits[i] = (ms[c-6] & (1 << i))? ms[6] : 0;
 	}
 	
 	if(flip & 1) ax = not1024(ax);
@@ -92,6 +92,33 @@ Bit1024 filterByClause(Bit1024 bt, int a, int b, int c, uint8_t flip){
 	for(int i = 0; i < 16; i++)
 		bt.bits[i] = bt.bits[i] & (ax.bits[i] | bx.bits[i] | cx.bits[i]);
 	return bt;
+}
+
+
+int getLocalSuperposition(Bit1024 bt, int v){
+	uint64_t ms[8];
+	ms[0] = 0x5555555555555555;
+	ms[1] = 0x3333333333333333;
+	ms[2] = 0x0f0f0f0f0f0f0f0f;
+	ms[3] = 0x00ff00ff00ff00ff;
+	ms[4] = 0x0000ffff0000ffff;
+	ms[5] = 0x00000000ffffffff;
+	ms[6] = 0xffffffffffffffff;
+	ms[7] = 0x0000000000000000;
+	
+	uint64_t a = 0, b = 0;
+	if(v < 6){
+		for(int i = 0; i < 16; i++){
+			a |= bt.bits[i] & ms[v];
+			b |= bt.bits[i] & ms[v];
+		}
+	}else{
+		for(int i = 0; i < 16; i++) a |= (ms[v-6] & (1 << i))? ms[6] : 0;
+		for(int i = 0; i < 16; i++) b |= (ms[v-6] & (1 << i))? ms[6] : 0;
+	}
+	a = a? 1 : 0;
+	b = b? 2 : 0;
+	return a | b;
 }
 
 
@@ -489,15 +516,27 @@ int solverStep(SolverState* solver){
 	IntStack stk = makeStack(64);
 	pushStack(&stk, select);
 	
+	if(0){
+		fail:
+		free(stk.stk);
+		return 0;
+	}
+	
 	while(stk.fill){
 		int here = popStack(&stk);
+		printf("  %i\n", here);
 		for(int i = 0; i < solver->stab.nhcts[here]; i++){
 			int nh = solver->stab.varnhs[here][i];
 			// TODO: constrain neighborhoods, return 0 if any become empty
 			// TODO: find new variables that flatten, add to stack
 			for(int j = 0; j < solver->stab.hoods[nh].varct; j++){
 				int v = solver->stab.hoods[nh].vars[j];
-				if(0){	// if var is known, add to stack
+				int s = getLocalSuperposition(solver->stab.hoods[nh].bits, j);
+				if(!s) goto fail;
+				if(s == 1){	// if var is known, add to stack
+					solver->solution[v/64] |= (1l << (v%64));
+					pushStack(&stk, v);
+				}else if(s == 2){
 					pushStack(&stk, v);
 				}
 			}
