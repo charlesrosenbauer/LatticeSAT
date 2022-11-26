@@ -486,7 +486,27 @@ int solverStep(SolverState* solver){
 	solver->solset[select/64] |= (1l << (select%64));
 	solver->solfill++;
 	
+	IntStack stk = makeStack(64);
+	pushStack(&stk, select);
 	
+	while(stk.fill){
+		int here = popStack(&stk);
+		for(int i = 0; i < solver->stab.nhcts[here]; i++){
+			int nh = solver->stab.varnhs[here][i];
+			// TODO: constrain neighborhoods, return 0 if any become empty
+			// TODO: find new variables that flatten, add to stack
+			for(int j = 0; j < solver->stab.hoods[nh].varct; j++){
+				int v = solver->stab.hoods[nh].vars[j];
+				if(0){	// if var is known, add to stack
+					pushStack(&stk, v);
+				}
+			}
+		}
+	
+	}
+	
+	
+	free(stk.stk);
 	return 1;
 }
 
