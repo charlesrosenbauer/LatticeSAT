@@ -29,8 +29,9 @@ int main(){
 	SolverState solver = makeSolverState(stab);
 	int cont = 1;
 	while(cont){
-		cont = solverStep(&solver);
-		cont = 0;
+		int backtrack = solverStep(&solver);
+		
+		cont = solver.stab.inst.varct > solver.solfill;
 	}
 	
 	/*

@@ -79,7 +79,7 @@ typedef struct{
 	
 	uint64_t*		solution;
 	uint64_t*		solset;
-	int				solfill;
+	int				solfill, solsize;
 }SolverState;
 
 

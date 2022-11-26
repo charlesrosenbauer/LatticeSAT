@@ -434,9 +434,9 @@ SolverState makeSolverState(SATTable stab){
 		ret.enttab[i] = stab.hoods[i].entropy;
 	}
 	
-	int solsize		= (stab.inst.varct / 64) + ((stab.inst.varct % 64) != 0);
-	ret.solution	= malloc(sizeof(uint64_t) * solsize);
-	ret.solset		= malloc(sizeof(uint64_t) * solsize);
+	ret.solsize		= (stab.inst.varct / 64) + ((stab.inst.varct % 64) != 0);
+	ret.solution	= malloc(sizeof(uint64_t) * ret.solsize);
+	ret.solset		= malloc(sizeof(uint64_t) * ret.solsize);
 	ret.solfill		= 0;;
 	return ret;
 }
@@ -462,6 +462,29 @@ int solverStep(SolverState* solver){
 	*/
 	
 	printf("====STEP: [%i/%i]====\n", solver->solfill, solver->stab.inst.varct);
+	if(solver->solfill == solver->stab.inst.varct) return 1;
+	
+	// For now, we're just going to pick new variables randomly
+	int select = -1;
+	int passes =  0;
+	while(select < 0){
+		passes++;
+		int ix = rng() % solver->stab.inst.varct;
+		if(!(solver->solset[ix/64] & (1l << (ix%64)))){
+			select = ix;
+		}else if(passes > 8){
+			for(int i = 0; i < solver->solsize; i++){
+				if(solver->solset[i] != 0xffffffffffffffff){
+					select = __builtin_ctzl(~solver->solset[i]);
+					i = solver->solsize;
+				}
+			}
+		}
+	}
+	
+	printf("->%i\n", select);
+	solver->solset[select/64] |= (1l << (select%64));
+	solver->solfill++;
 	
 	
 	return 1;
