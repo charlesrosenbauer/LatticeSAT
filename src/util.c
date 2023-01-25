@@ -36,6 +36,35 @@ int	popStack(IntStack* stk){
 
 
 
+
+IntList makeIntList(int size){
+	IntList ret;
+	ret.xs  = malloc(sizeof(int) * size);
+	ret.len = 0;
+	ret.cap = size;
+	return ret;
+}
+
+int growIntList(IntList* lst, int size){
+	if(lst->cap < size){
+		int* xs = lst->xs;
+		lst->xs = malloc(sizeof(int) * size);
+		for(int i = 0; i < lst->len; i++) lst->xs[i] = xs[i];
+		lst->cap  = size;
+		free(xs);
+	}
+	return lst->cap;
+}
+
+int appendIntList(IntList* lst, int x){
+	if(lst->len+5 >= lst->cap) growIntList(lst, lst->cap * 2);
+	lst->xs[lst->len] = x;
+	lst->len++;
+	return lst->len-1;
+}
+
+
+
 uint64_t RNGSTATEA = 3189571098710891;
 uint64_t RNGSTATEB = 8930819035719833;
 

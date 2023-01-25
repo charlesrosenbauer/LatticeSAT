@@ -16,6 +16,16 @@ int			popStack		(IntStack*);
 
 
 typedef struct{
+	int*	xs;
+	int		len, cap;
+}IntList;
+
+IntList makeIntList  (int);
+int     growIntList  (IntList*, int);
+int     appendIntList(IntList*, int);
+
+
+typedef struct{
 	uint64_t	x, y;
 }Bloom128;
 
