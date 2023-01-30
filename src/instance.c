@@ -22,14 +22,17 @@ Instance	newInstance(int varct, int clsct){
 Instance	randomInstance(int varct, int clsct){
 	Instance ret = newInstance(varct, clsct);
 	for(int i = 0; i < clsct; i++){
-		uint8_t sign =  (rng() >> 47);
-		int32_t a    = ((rng() >> 19) % varct) + 1;
-		int32_t b    = ((rng() >> 17) % varct) + 1;
-		int32_t c    = ((rng() >> 23) % varct) + 1;
-		a           *=  (sign & 1)?  -1 : 1;
-		b           *=  (sign & 2)?  -1 : 1;
-		c           *=  (sign & 4)?  -1 : 1;
-		ret.clauses[i] = (Clause){a, b, c};
+		uint8_t sign    =  (rng() >> 47);
+		int32_t a       = ((rng() >> 19) % varct) + 1;
+		int32_t b       = ((rng() >> 17) % varct) + 1;
+		int32_t c       = ((rng() >> 23) % varct) + 1;
+		while(a == b) a = ((rng() >> 19) % varct) + 1;
+		while(a == c) c = ((rng() >> 23) % varct) + 1;
+		while(b == c) b = ((rng() >> 17) % varct) + 1;
+		a              *=  (sign & 1)?  -1 : 1;
+		b              *=  (sign & 2)?  -1 : 1;
+		c              *=  (sign & 4)?  -1 : 1;
+		ret.clauses[i]  = (Clause){a, b, c};
 	}
 	
 	return ret;
@@ -115,10 +118,10 @@ int checkInstance(Instance inst){
 
 
 void printInstance(Instance inst){
-	printf("============%i %i============\n", inst.varct, inst.clausect);
+	printf("================%i %i================\n", inst.varct, inst.clausect);
 	for(int i = 0; i < inst.clausect; i++){
 		Clause c = inst.clauses[i];
-		printf("%6i %6i %6i\n", c.a, c.b, c.c);
+		printf("%4i : %6i %6i %6i\n", i, c.a, c.b, c.c);
 	}
 }
 

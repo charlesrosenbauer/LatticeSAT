@@ -29,6 +29,9 @@ int main(){
 	
 	if(solve(&inst)){
 		printf("SAT\n");
+		for(int i = 1; i <= inst.varct; i++)
+			printf("%c", (inst.assignment[i/64] & (1l << (i % 64)))? '1' : '0');
+		printf("\n");
 	}else{
 		printf("UNSAT\n");
 	}

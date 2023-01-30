@@ -20,7 +20,7 @@ int solve(Instance* sat){
 	
 	int ix = 1;
 	while((ix <= sat->varct) && (ix > 0)){
-		ix++;
+		printf("TRY #%3i = %i\n", ix, ((sat->assignment[ix / 64] & (1l << (ix % 64))) != 0));
 		
 		int  pass = 1;
 		// TODO: optimize this later
@@ -30,13 +30,13 @@ int solve(Instance* sat){
 			int    xb = cs.b < 0? -cs.b : cs.b;
 			int    xc = cs.c < 0? -cs.c : cs.c;
 			
-			int   pos = ix+1;
-			if((xa >= pos) && (xb >= pos) && (xc >= pos)){
+			if((xa <= ix) && (xb <= ix) && (xc <= ix)){
 				// check for inconsistency
-				xa = (sat->assignment[xa / 64] & (1l << (xa % 64)))? -xa : xa;
-				xb = (sat->assignment[xb / 64] & (1l << (xb % 64)))? -xb : xb;
-				xc = (sat->assignment[xc / 64] & (1l << (xc % 64)))? -xc : xc;
+				xa = (sat->assignment[xa / 64] & (1l << (xa % 64)))? xa : -xa;
+				xb = (sat->assignment[xb / 64] & (1l << (xb % 64)))? xb : -xb;
+				xc = (sat->assignment[xc / 64] & (1l << (xc % 64)))? xc : -xc;
 				if((xa != cs.a) && (xb != cs.b) && (xc != cs.c)){
+					printf("FAIL ON CLAUSE %i\n", i);
 					pass = 0;
 					i    = sat->clausect;
 				}
@@ -44,10 +44,13 @@ int solve(Instance* sat){
 		}
 		if(!pass){
 			if(sat->assignment[ix / 64] & (1l << (ix % 64))){
-				sat->assignment[ix / 64] |= (1l << (ix % 64));
-			}else{
+				printf("backtrack\n");
 				sat->assignment[ix / 64] ^= (1l << (ix % 64));
 				ix--;
+				sat->assignment[ix / 64] ^= (1l << (ix % 64));
+			}else{
+				printf("guess again\n");
+				sat->assignment[ix / 64] |= (1l << (ix % 64));
 			}
 		}else{
 			ix++;
