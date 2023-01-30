@@ -115,10 +115,10 @@ int checkInstance(Instance inst){
 
 
 void printInstance(Instance inst){
-	printf("====%i %i====\n", inst.varct, inst.clausect);
+	printf("============%i %i============\n", inst.varct, inst.clausect);
 	for(int i = 0; i < inst.clausect; i++){
 		Clause c = inst.clauses[i];
-		printf("%i %i %i\n", c.a, c.b, c.c);
+		printf("%6i %6i %6i\n", c.a, c.b, c.c);
 	}
 }
 

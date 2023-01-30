@@ -101,5 +101,7 @@ int				precheckSAT		(SATTable);
 SolverState		makeSolverState	(SATTable);
 int				solverStep		(SolverState*);
 
+int				solve			(Instance*);
+
 
 #endif
