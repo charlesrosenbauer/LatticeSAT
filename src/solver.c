@@ -15,48 +15,25 @@
 	* CDCL-like approach of adding new neighborhoods on big backtracks
 */
 int solve(Instance* sat){
-	int asgnsize = ((sat->varct+1) / 64) + (((sat->varct+1) % 64) != 0);
+	int       asgnsize = ((sat->varct+1) / 64) + (((sat->varct+1) % 64) != 0);
+	uint64_t*  setbits = malloc(sizeof(uint64_t) * asgnsize);
+	uint64_t* flipbits = malloc(sizeof(uint64_t) * asgnsize);
 	for(int i = 0; i < asgnsize; i++) sat->assignment[i] = 0;
+	for(int i = 0; i < asgnsize; i++) setbits        [i] = 0;
+	for(int i = 0; i < asgnsize; i++) flipbits       [i] = 0;
 	
-	int ix = 1;
-	while((ix <= sat->varct) && (ix > 0)){
-		printf("TRY #%3i = %i\n", ix, ((sat->assignment[ix / 64] & (1l << (ix % 64))) != 0));
+	uint32_t* picks = malloc(sizeof(uint32_t) * (sat->varct+1));
+	int       head  = 1;
+	
+	while((head > 0) && (head <= sat->varct)){
+		for(int i = 1; i < head; i++){
+			// print stack for debug purposes
+		}
 		
-		int  pass = 1;
-		// TODO: optimize this later
-		for(int i = 0; i < sat->clausect; i++){
-			Clause cs = sat->clauses[i];
-			int    xa = cs.a < 0? -cs.a : cs.a;
-			int    xb = cs.b < 0? -cs.b : cs.b;
-			int    xc = cs.c < 0? -cs.c : cs.c;
-			
-			if((xa <= ix) && (xb <= ix) && (xc <= ix)){
-				// check for inconsistency
-				xa = (sat->assignment[xa / 64] & (1l << (xa % 64)))? xa : -xa;
-				xb = (sat->assignment[xb / 64] & (1l << (xb % 64)))? xb : -xb;
-				xc = (sat->assignment[xc / 64] & (1l << (xc % 64)))? xc : -xc;
-				if((xa != cs.a) && (xb != cs.b) && (xc != cs.c)){
-					printf("FAIL ON CLAUSE %i\n", i);
-					pass = 0;
-					i    = sat->clausect;
-				}
-			}
-		}
-		if(!pass){
-			if(sat->assignment[ix / 64] & (1l << (ix % 64))){
-				printf("backtrack\n");
-				sat->assignment[ix / 64] ^= (1l << (ix % 64));
-				ix--;
-				sat->assignment[ix / 64] ^= (1l << (ix % 64));
-			}else{
-				printf("guess again\n");
-				sat->assignment[ix / 64] |= (1l << (ix % 64));
-			}
-		}else{
-			ix++;
-		}
+		// exit for now
+		head = 0;
 	}
 	
-	return ix >= sat->varct;
+	return 0;
 }
 
