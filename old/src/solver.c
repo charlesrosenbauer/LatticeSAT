@@ -37,3 +37,10 @@ int solve(Instance* sat){
 	return 0;
 }
 
+
+
+int checkSolution(Instance* sat){
+	for(int i = 0; i < sat->clausect; i++){
+		
+	}
+}
