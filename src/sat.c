@@ -71,3 +71,39 @@ void printSAT(Instance sat){
 	for(int i = 0; i < sat.cct; i++)
 		printf("  %8i   %8i   %8i\n", sat.cs[i].a, sat.cs[i].b, sat.cs[i].c);
 }
+
+
+void annealing(Instance sat){
+	/*
+		TODO:
+		Annealing different parts of the instance in parallel could be a useful
+		variation on this, though it would require sorting the graph to maximize
+		structure-mapping.
+	*/
+	int temp = 1048576;
+	int good = checkAssignment(sat);
+	int init = good;
+	uint64_t* bits = malloc(sizeof(uint64_t) * 3);
+	for(int i = 0; i < 3; i++) bits[i] = 0;
+	
+	while(temp > 0){
+		int accept = ((rng() % 1048576) * 4) < temp;
+		
+		for(int i = 0; i < 3; i++) bits[i] = rng() & rng() & rng() & rng();
+		for(int i = 0; i < 3; i++) sat.bits[i] ^= bits[i];
+		
+		int match = checkAssignment(sat);
+		if(accept || (match > good)){
+			good = match;
+		}else{
+			for(int i = 0; i < 3; i++) sat.bits[i] ^= bits[i];
+		}
+		
+		//if((temp % 256) == 1) printf("T=%i\n", good);
+		if(temp > 262144) temp -= 3;
+		temp--;
+	}
+	
+	printf("%i / %i\n", init, checkAssignment(sat));
+}
+
