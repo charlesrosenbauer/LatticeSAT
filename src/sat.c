@@ -24,6 +24,11 @@ Instance randomSAT(int cct, int vct){
 		c.b   = (rng() % vct) + 1;
 		c.c   = (rng() % vct) + 1;
 		
+		if((c.a == c.b) || (c.a == c.c) || (c.b == c.c)){
+			i--;
+			continue;
+		}
+		
 		uint64_t x = rng();
 		c.a   = (x & 1)? c.a : -c.a;
 		c.b   = (x & 2)? c.b : -c.b;
@@ -37,12 +42,32 @@ Instance randomSAT(int cct, int vct){
 
 
 int	checkAssignment(Instance sat){
-
-	return 0;
+	int     ct = 0;
+	for(int i  = 0; i < sat.cct; i++){
+		int ax = sat.cs[i].a;
+		int bx = sat.cs[i].b;
+		int cx = sat.cs[i].c;
+		
+		int ai = ax < 0? -ax : ax;
+		int bi = bx < 0? -bx : bx;
+		int ci = cx < 0? -cx : cx;
+		
+		ax     = ax > 0?   1 :  0;
+		bx     = bx > 0?   1 :  0;
+		cx     = cx > 0?   1 :  0;
+		
+		int am = (sat.bits[ai/64] & (1l << (ai % 64))) != 0;
+		int bm = (sat.bits[bi/64] & (1l << (bi % 64))) != 0;
+		int cm = (sat.bits[ci/64] & (1l << (ci % 64))) != 0;
+		
+		ct    += (ax != am) || (bx != bm) || (cx != cm);
+	}
+	return ct;
 }
 
 
 void printSAT(Instance sat){
-
-
+	printf("================%i/%i================\n", sat.vct, sat.cct);
+	for(int i = 0; i < sat.cct; i++)
+		printf("  %8i   %8i   %8i\n", sat.cs[i].a, sat.cs[i].b, sat.cs[i].c);
 }
