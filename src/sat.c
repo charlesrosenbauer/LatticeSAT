@@ -143,6 +143,56 @@ void annealing(Instance sat){
 }
 
 
+void sortInstance(Instance sat){
+	/*
+		TODO:
+		1. Sort/group clauses based on variables included
+		2. Sort variables based on heuristics (VSIDS, etc.)
+		3. Create mapping back to original var mapping
+	*/
+	for(int i  = 0; i < sat.cct; i++){
+		int a  = sat.cs[i].a;
+		int b  = sat.cs[i].b;
+		int c  = sat.cs[i].c;
+
+		int ai = a < 0? -a : a;
+		int bi = b < 0? -b : b;
+		int ci = c < 0? -c : c;
+		
+		if(ai > bi){
+			int t  = a;
+			int ti = ai;
+			a      = b;
+			ai     = bi;
+			b      = t;
+			bi     = ti;
+		}
+		if(bi > ci){
+			int t  = b;
+			int ti = bi;
+			b      = c;
+			bi     = ci;
+			c      = t;
+			ci     = ti;
+		}
+		if(ai > bi){
+			int t  = a;
+			int ti = ai;
+			a      = b;
+			ai     = bi;
+			b      = t;
+			bi     = ti;
+		}
+		
+		sat.cs[i].a = a;
+		sat.cs[i].b = b;
+		sat.cs[i].c = c;
+	}
+}
+
+
+
+
 
 int solver(Instance sat, int* cts){
 	if(cts != NULL)

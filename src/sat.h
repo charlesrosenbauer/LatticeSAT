@@ -20,6 +20,7 @@ Instance	randomSAT		(int, int);
 int			checkAssignment	(Instance);
 void		printSAT		(Instance);
 int			checkClause		(Instance, int);
+void		sortInstance	(Instance);
 int			solver			(Instance, int*);
 void		solverBenchmark	(int, int, int, int);
 

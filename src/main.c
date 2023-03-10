@@ -7,6 +7,7 @@
 
 
 int main(){
-
-	
+	Instance sat = randomSAT(64, 16);
+	sortInstance(sat);
+	printSAT(sat);
 }
