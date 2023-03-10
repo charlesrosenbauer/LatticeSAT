@@ -19,7 +19,7 @@ typedef struct{
 Instance	randomSAT		(int, int);
 int			checkAssignment	(Instance);
 void		printSAT		(Instance);
-
+int			checkClause		(Instance, int);
 
 
 

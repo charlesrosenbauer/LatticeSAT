@@ -41,6 +41,27 @@ Instance randomSAT(int cct, int vct){
 }
 
 
+int checkClause(Instance sat, int i){
+	int ax = sat.cs[i].a;
+	int bx = sat.cs[i].b;
+	int cx = sat.cs[i].c;
+	
+	int ai = ax < 0? -ax : ax;
+	int bi = bx < 0? -bx : bx;
+	int ci = cx < 0? -cx : cx;
+		
+	ax     = ax > 0?   1 :  0;
+	bx     = bx > 0?   1 :  0;
+	cx     = cx > 0?   1 :  0;
+		
+	int am = (sat.bits[ai/64] & (1l << (ai % 64))) != 0;
+	int bm = (sat.bits[bi/64] & (1l << (bi % 64))) != 0;
+	int cm = (sat.bits[ci/64] & (1l << (ci % 64))) != 0;
+	
+	return (ax != am) || (bx != bm) || (cx != cm);
+}
+
+
 int	checkAssignment(Instance sat){
 	int     ct = 0;
 	for(int i  = 0; i < sat.cct; i++){
