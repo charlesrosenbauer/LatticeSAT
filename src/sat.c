@@ -58,7 +58,7 @@ int checkClause(Instance sat, int i){
 	int bm = (sat.bits[bi/64] & (1l << (bi % 64))) != 0;
 	int cm = (sat.bits[ci/64] & (1l << (ci % 64))) != 0;
 	
-	return (ax != am) || (bx != bm) || (cx != cm);
+	return (ax == am) || (bx == bm) || (cx == cm);
 }
 
 
@@ -81,7 +81,7 @@ int	checkAssignment(Instance sat){
 		int bm = (sat.bits[bi/64] & (1l << (bi % 64))) != 0;
 		int cm = (sat.bits[ci/64] & (1l << (ci % 64))) != 0;
 		
-		ct    += (ax != am) || (bx != bm) || (cx != cm);
+		ct    += (ax == am) || (bx == bm) || (cx == cm);
 	}
 	return ct;
 }
