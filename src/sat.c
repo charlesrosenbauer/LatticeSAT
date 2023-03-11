@@ -115,7 +115,7 @@ void printDecorSAT(DecorInstance sat){
 	for(int i = 1; i <= sat.sat.vct; i++){
 		printf("%8i | [%3i]", i, sat.vcsct[i]);
 		for(int j = 0; j < sat.vcsct[i]; j++)
-			printf("%5i ", sat.varcs[i][j]);
+			printf("%6i ", sat.varcs[i][j]);
 		printf("\n");
 	}
 }
@@ -251,7 +251,7 @@ DecorInstance sortInstance(Instance sat){
 
 
 
-int solver(Instance sat, int* cts){
+int dfsSolver(Instance sat, int* cts){
 	if(cts != NULL)
 		for(int i = 0; i <= sat.vct; i++) cts[i] = 0;
 
@@ -327,6 +327,28 @@ int solver(Instance sat, int* cts){
 
 
 
+int solver(DecorInstance sat, int* cts){
+	/*
+		TODO:
+		* DFS solver with order invariance
+		* add unit propagation
+		* eventually support neighborhoods and bitSAT
+		* eventually support neighborhood learning
+	*/
+	int* path = malloc(sizeof(int) * (sat.sat.vct+1));
+	for(int i = 0; i < (sat.sat.vct+1); i++) path[i] = 0;
+	
+	int ix = 1;
+	while((ix > 0) && (ix <= sat.sat.vct)){
+		
+		ix--;
+	}
+	
+	return 0;
+}
+
+
+
 void solverBenchmark(int head, int tail, int skip, int size){
 	int val = 0;
 	int max = 0;
@@ -335,7 +357,7 @@ void solverBenchmark(int head, int tail, int skip, int size){
 		//printSAT(sat);
 	
 		int* table = alloca(sizeof(int) * (size + 4));
-		solver(sat, table);
+		dfsSolver(sat, table);
 	
 		printf("%i\n", checkAssignment(sat));
 		printHistogram(table, sat.vct+1);

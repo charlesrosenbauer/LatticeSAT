@@ -29,7 +29,8 @@ int				checkAssignment	(Instance);
 void			printSAT		(Instance);
 int				checkClause		(Instance, int);
 DecorInstance	sortInstance	(Instance);
-int				solver			(Instance, int*);
+int				solver			(DecorInstance, int*);
+int				dfsSolver		(Instance, int*);
 void			solverBenchmark	(int, int, int, int);
 void			printDecorSAT	(DecorInstance);
 
