@@ -19,7 +19,7 @@ typedef struct{
 	Instance	sat;
 	
 	int*		vmap;
-	Clause**	varcs;
+	int**		varcs;
 	int*		vcsct;
 }DecorInstance;
 
@@ -31,7 +31,7 @@ int				checkClause		(Instance, int);
 DecorInstance	sortInstance	(Instance);
 int				solver			(Instance, int*);
 void			solverBenchmark	(int, int, int, int);
-
+void			printDecorSAT	(DecorInstance);
 
 void			printHistogram	(int*, int);
 

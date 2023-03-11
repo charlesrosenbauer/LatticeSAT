@@ -108,6 +108,19 @@ void printSAT(Instance sat){
 }
 
 
+void printDecorSAT(DecorInstance sat){
+	printf("================%i/%i================\n", sat.sat.vct, sat.sat.cct);
+	for(int i = 0; i < sat.sat.cct; i++)
+		printf("  %8i   %8i   %8i\n", sat.sat.cs[i].a, sat.sat.cs[i].b, sat.sat.cs[i].c);
+	for(int i = 1; i <= sat.sat.vct; i++){
+		printf("%8i | [%3i]", i, sat.vcsct[i]);
+		for(int j = 0; j < sat.vcsct[i]; j++)
+			printf("%5i ", sat.varcs[i][j]);
+		printf("\n");
+	}
+}
+
+
 void annealing(Instance sat){
 	/*
 		TODO:
@@ -197,9 +210,9 @@ DecorInstance sortInstance(Instance sat){
 	
 	
 	// Group clauses by variable
-	ret.varcs = malloc(sizeof(Clause*) *  (ret.sat.vct + 1));
-	ret.vcsct = malloc(sizeof(int    ) *  (ret.sat.vct + 1));
-	for(int i = 1; i < ret.sat.vct+1; i++) ret.vcsct[i] = 0;
+	ret.varcs = malloc(sizeof(int*) *  (ret.sat.vct + 1));
+	ret.vcsct = malloc(sizeof(int ) *  (ret.sat.vct + 1));
+	for(int i = 0; i < ret.sat.vct+1; i++) ret.vcsct[i] = 0;
 	for(int i = 0; i < ret.sat.cct  ; i++){
 		Clause cs = ret.sat.cs[i];
 		int     a = cs.a < 0? -cs.a : cs.a;
@@ -217,16 +230,16 @@ DecorInstance sortInstance(Instance sat){
 		int     b = cs.b < 0? -cs.b : cs.b;
 		int     c = cs.c < 0? -cs.c : cs.c;
 		
-		ret.varcs[a][ret.vcsct[a]] = cs;
+		ret.varcs[a][ret.vcsct[a]] = i;
 		ret.vcsct[a]++;
 		
 		if(a != b){
-			ret.varcs[b][ret.vcsct[b]] = cs;
+			ret.varcs[b][ret.vcsct[b]] = i;
 			ret.vcsct[b]++;
 		}
 		
 		if((a != c) && (b != c)){
-			ret.varcs[c][ret.vcsct[c]] = cs;
+			ret.varcs[c][ret.vcsct[c]] = i;
 			ret.vcsct[c]++;
 		}
 	}

@@ -7,7 +7,7 @@
 
 
 int main(){
-	Instance sat = randomSAT(64, 16);
-	sortInstance(sat);
-	printSAT(sat);
+	Instance       sat = randomSAT(64, 16);
+	DecorInstance dsat = sortInstance(sat);
+	printDecorSAT(dsat);
 }
