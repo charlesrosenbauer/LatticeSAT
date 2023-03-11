@@ -36,6 +36,17 @@ int      checkBloom128 (Bloom128 , uint64_t);
 void     insertBloom128(Bloom128*, uint64_t);
 int      bloom128Fill  (Bloom128);
 
+typedef struct{
+	Bloom128	bloom;
+	int*		xs;
+	int			fill, size;
+}BloomList;
+
+BloomList	makeBlmList		(int);
+int			appendBlmList	(BloomList*, int);
+int			checkBlmList	(BloomList*, int);
+void		printBlmList	(BloomList*, int);
+
 
 typedef struct{
 	uint64_t	bits[4];

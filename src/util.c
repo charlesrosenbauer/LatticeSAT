@@ -102,12 +102,70 @@ int bloom128Fill(Bloom128 b){
 }
 
 
+void printBloom128(Bloom128 b){
+	printf("[%3i/128] ", bloom128Fill(b));
+	for(int i = 0; i < 64; i++) printf("%c", (b.x & (1l << i))? '#' : '_');
+	for(int i = 0; i < 64; i++) printf("%c", (b.y & (1l << i))? '#' : '_');
+	printf("\n");
+}
+
+
 int		matchLSH(LSH256 a, LSH256 b){
 	int ret = 0;
 	for(int i = 0; i < 4; i++)
 		ret += __builtin_popcountl(a.bits[i] ^ b.bits[i]);
 	return ret;
 }
+
+
+BloomList makeBlmList(int size){
+	BloomList ret;
+	ret.xs		= malloc(sizeof(int) * size);
+	ret.fill	= 0;
+	ret.size	= size;
+	ret.bloom	= (Bloom128){0, 0};
+	return ret;
+}
+
+
+int checkBlmList(BloomList* b, int x){
+	if(checkBloom128(b->bloom, x))
+		for(int i = 0; i < b->fill; i++)
+			if(b->xs[i] == x) return 1;
+	return 0;
+}
+
+
+int appendBlmList(BloomList* b, int x){
+	if(b->fill+5 >= b->size){
+		int* tmp  = b->xs;
+		b->size  *= 2;
+		b->xs     = malloc(sizeof(int) * b->size);
+		for(int i = 0; i < b->fill; i++) b->xs[i] = tmp[i];
+		free(tmp);
+	}
+
+	if(checkBlmList(b, x)) return 0;
+	insertBloom128(&b->bloom, x);
+	b->xs[b->fill] = x;
+	b->fill++;
+	return 1;
+}
+
+
+void printBlmList(BloomList* b, int x){
+	printBloom128(b->bloom);
+	printf("[%3i/%3i] := \n", b->fill, b->size);
+	for(int i = 0; i < b->fill; i++){
+		printf("%6i ", b->xs[i]);
+		if((i % 16) == 15) printf("\n");
+	}
+	printf("\n");
+}
+
+
+
+
 
 
 uint64_t RNGSTATEA = 839157918718971;
