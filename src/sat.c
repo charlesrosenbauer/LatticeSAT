@@ -143,17 +143,23 @@ void annealing(Instance sat){
 }
 
 
-void sortInstance(Instance sat){
+DecorInstance sortInstance(Instance sat){
+	DecorInstance ret;
+	ret.sat = sat;
+	
+	
+	
+	
 	/*
 		TODO:
 		1. Sort/group clauses based on variables included
 		2. Sort variables based on heuristics (VSIDS, etc.)
 		3. Create mapping back to original var mapping
 	*/
-	for(int i  = 0; i < sat.cct; i++){
-		int a  = sat.cs[i].a;
-		int b  = sat.cs[i].b;
-		int c  = sat.cs[i].c;
+	for(int i  = 0; i < ret.sat.cct; i++){
+		int a  = ret.sat.cs[i].a;
+		int b  = ret.sat.cs[i].b;
+		int c  = ret.sat.cs[i].c;
 
 		int ai = a < 0? -a : a;
 		int bi = b < 0? -b : b;
@@ -184,10 +190,48 @@ void sortInstance(Instance sat){
 			bi     = ti;
 		}
 		
-		sat.cs[i].a = a;
-		sat.cs[i].b = b;
-		sat.cs[i].c = c;
+		ret.sat.cs[i].a = a;
+		ret.sat.cs[i].b = b;
+		ret.sat.cs[i].c = c;
 	}
+	
+	
+	// Group clauses by variable
+	ret.varcs = malloc(sizeof(Clause*) *  (ret.sat.vct + 1));
+	ret.vcsct = malloc(sizeof(int    ) *  (ret.sat.vct + 1));
+	for(int i = 1; i < ret.sat.vct+1; i++) ret.vcsct[i] = 0;
+	for(int i = 0; i < ret.sat.cct  ; i++){
+		Clause cs = ret.sat.cs[i];
+		int     a = cs.a < 0? -cs.a : cs.a;
+		int     b = cs.b < 0? -cs.b : cs.b;
+		int     c = cs.c < 0? -cs.c : cs.c;
+		ret.vcsct[a]++;
+		ret.vcsct[b] +=  (a != b)             ? 1 : 0;
+		ret.vcsct[c] += ((a != c) && (b != c))? 1 : 0;
+	}
+	for(int i = 1; i < ret.sat.vct+1; i++) ret.varcs[i] = malloc(sizeof(int) * ret.vcsct[i]);
+	for(int i = 1; i < ret.sat.vct+1; i++) ret.vcsct[i] = 0;
+	for(int i = 0; i < ret.sat.cct  ; i++){
+		Clause cs = ret.sat.cs[i];
+		int     a = cs.a < 0? -cs.a : cs.a;
+		int     b = cs.b < 0? -cs.b : cs.b;
+		int     c = cs.c < 0? -cs.c : cs.c;
+		
+		ret.varcs[a][ret.vcsct[a]] = cs;
+		ret.vcsct[a]++;
+		
+		if(a != b){
+			ret.varcs[b][ret.vcsct[b]] = cs;
+			ret.vcsct[b]++;
+		}
+		
+		if((a != c) && (b != c)){
+			ret.varcs[c][ret.vcsct[c]] = cs;
+			ret.vcsct[c]++;
+		}
+	}
+	
+	return ret;
 }
 
 
