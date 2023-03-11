@@ -3,6 +3,8 @@
 
 #include "stdint.h"
 
+#include "util.h"
+
 
 typedef struct{
 	int32_t a, b, c;
@@ -20,6 +22,7 @@ typedef struct{
 	Clause*		cs;
 	int			cct, vct;
 	
+	BloomList*	neighbors;
 	int*		vmap;
 	int**		varcs;
 	int*		vcsct;

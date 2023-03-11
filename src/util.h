@@ -45,7 +45,7 @@ typedef struct{
 BloomList	makeBlmList		(int);
 int			appendBlmList	(BloomList*, int);
 int			checkBlmList	(BloomList*, int);
-void		printBlmList	(BloomList*, int);
+void		printBlmList	(BloomList*);
 
 
 typedef struct{

@@ -118,6 +118,10 @@ void printDecorSAT(DecorInstance sat){
 			printf("%6i ", sat.varcs[i][j]);
 		printf("\n");
 	}
+	for(int i = 1; i <= sat.vct; i++){
+		printf("%8i | ", i);
+		printBlmList(&sat.neighbors[i]);
+	}
 }
 
 
@@ -211,8 +215,11 @@ DecorInstance sortInstance(Instance sat){
 	
 	
 	// Group clauses by variable
-	ret.varcs = malloc(sizeof(int*) *  (ret.vct + 1));
-	ret.vcsct = malloc(sizeof(int ) *  (ret.vct + 1));
+	ret.neighbors = malloc(sizeof(BloomList) * (ret.vct + 1));
+	for(int i = 1; i < ret.vct+1; i++) ret.neighbors[i] = makeBlmList(64);
+	
+	ret.varcs = malloc(sizeof(int*) * (ret.vct + 1));
+	ret.vcsct = malloc(sizeof(int ) * (ret.vct + 1));
 	for(int i = 0; i < ret.vct+1; i++) ret.vcsct[i] = 0;
 	for(int i = 0; i < ret.cct  ; i++){
 		Clause cs = ret.cs[i];
@@ -243,6 +250,21 @@ DecorInstance sortInstance(Instance sat){
 			ret.varcs[c][ret.vcsct[c]] = i;
 			ret.vcsct[c]++;
 		}
+	}
+	for(int i = 0; i < ret.cct; i++){
+		Clause cs = ret.cs[i];
+		int     a = cs.a < 0? -cs.a : cs.a;
+		int     b = cs.b < 0? -cs.b : cs.b;
+		int     c = cs.c < 0? -cs.c : cs.c;
+		
+		appendBlmList(&ret.neighbors[a], b);
+		appendBlmList(&ret.neighbors[a], c);
+		
+		appendBlmList(&ret.neighbors[b], a);
+		appendBlmList(&ret.neighbors[b], c);
+		
+		appendBlmList(&ret.neighbors[c], a);
+		appendBlmList(&ret.neighbors[c], b);
 	}
 	
 	return ret;

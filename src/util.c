@@ -130,7 +130,8 @@ BloomList makeBlmList(int size){
 
 int checkBlmList(BloomList* b, int x){
 	if(checkBloom128(b->bloom, x))
-		for(int i = 0; i < b->fill; i++)
+		// optimization: assume value was inserted recently
+		for(int i = b->fill-1; i >= 0; i--)
 			if(b->xs[i] == x) return 1;
 	return 0;
 }
@@ -153,7 +154,7 @@ int appendBlmList(BloomList* b, int x){
 }
 
 
-void printBlmList(BloomList* b, int x){
+void printBlmList(BloomList* b){
 	printBloom128(b->bloom);
 	printf("[%3i/%3i] := \n", b->fill, b->size);
 	for(int i = 0; i < b->fill; i++){
