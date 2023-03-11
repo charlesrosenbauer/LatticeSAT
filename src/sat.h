@@ -16,7 +16,9 @@ typedef struct{
 }Instance;
 
 typedef struct{
-	Instance	sat;
+	uint64_t*	bits;
+	Clause*		cs;
+	int			cct, vct;
 	
 	int*		vmap;
 	int**		varcs;

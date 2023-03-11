@@ -109,10 +109,10 @@ void printSAT(Instance sat){
 
 
 void printDecorSAT(DecorInstance sat){
-	printf("================%i/%i================\n", sat.sat.vct, sat.sat.cct);
-	for(int i = 0; i < sat.sat.cct; i++)
-		printf("  %8i   %8i   %8i\n", sat.sat.cs[i].a, sat.sat.cs[i].b, sat.sat.cs[i].c);
-	for(int i = 1; i <= sat.sat.vct; i++){
+	printf("================%i/%i================\n", sat.vct, sat.cct);
+	for(int i = 0; i < sat.cct; i++)
+		printf("  %8i   %8i   %8i\n", sat.cs[i].a, sat.cs[i].b, sat.cs[i].c);
+	for(int i = 1; i <= sat.vct; i++){
 		printf("%8i | [%3i]", i, sat.vcsct[i]);
 		for(int j = 0; j < sat.vcsct[i]; j++)
 			printf("%6i ", sat.varcs[i][j]);
@@ -158,9 +158,10 @@ void annealing(Instance sat){
 
 DecorInstance sortInstance(Instance sat){
 	DecorInstance ret;
-	ret.sat = sat;
-	
-	
+	ret.bits	= sat.bits;
+	ret.cs		= sat.cs;
+	ret.cct		= sat.cct;
+	ret.vct		= sat.vct;
 	
 	
 	/*
@@ -169,10 +170,10 @@ DecorInstance sortInstance(Instance sat){
 		2. Sort variables based on heuristics (VSIDS, etc.)
 		3. Create mapping back to original var mapping
 	*/
-	for(int i  = 0; i < ret.sat.cct; i++){
-		int a  = ret.sat.cs[i].a;
-		int b  = ret.sat.cs[i].b;
-		int c  = ret.sat.cs[i].c;
+	for(int i  = 0; i < ret.cct; i++){
+		int a  = ret.cs[i].a;
+		int b  = ret.cs[i].b;
+		int c  = ret.cs[i].c;
 
 		int ai = a < 0? -a : a;
 		int bi = b < 0? -b : b;
@@ -203,18 +204,18 @@ DecorInstance sortInstance(Instance sat){
 			bi     = ti;
 		}
 		
-		ret.sat.cs[i].a = a;
-		ret.sat.cs[i].b = b;
-		ret.sat.cs[i].c = c;
+		ret.cs[i].a = a;
+		ret.cs[i].b = b;
+		ret.cs[i].c = c;
 	}
 	
 	
 	// Group clauses by variable
-	ret.varcs = malloc(sizeof(int*) *  (ret.sat.vct + 1));
-	ret.vcsct = malloc(sizeof(int ) *  (ret.sat.vct + 1));
-	for(int i = 0; i < ret.sat.vct+1; i++) ret.vcsct[i] = 0;
-	for(int i = 0; i < ret.sat.cct  ; i++){
-		Clause cs = ret.sat.cs[i];
+	ret.varcs = malloc(sizeof(int*) *  (ret.vct + 1));
+	ret.vcsct = malloc(sizeof(int ) *  (ret.vct + 1));
+	for(int i = 0; i < ret.vct+1; i++) ret.vcsct[i] = 0;
+	for(int i = 0; i < ret.cct  ; i++){
+		Clause cs = ret.cs[i];
 		int     a = cs.a < 0? -cs.a : cs.a;
 		int     b = cs.b < 0? -cs.b : cs.b;
 		int     c = cs.c < 0? -cs.c : cs.c;
@@ -222,10 +223,10 @@ DecorInstance sortInstance(Instance sat){
 		ret.vcsct[b] +=  (a != b)             ? 1 : 0;
 		ret.vcsct[c] += ((a != c) && (b != c))? 1 : 0;
 	}
-	for(int i = 1; i < ret.sat.vct+1; i++) ret.varcs[i] = malloc(sizeof(int) * ret.vcsct[i]);
-	for(int i = 1; i < ret.sat.vct+1; i++) ret.vcsct[i] = 0;
-	for(int i = 0; i < ret.sat.cct  ; i++){
-		Clause cs = ret.sat.cs[i];
+	for(int i = 1; i < ret.vct+1; i++) ret.varcs[i] = malloc(sizeof(int) * ret.vcsct[i]);
+	for(int i = 1; i < ret.vct+1; i++) ret.vcsct[i] = 0;
+	for(int i = 0; i < ret.cct  ; i++){
+		Clause cs = ret.cs[i];
 		int     a = cs.a < 0? -cs.a : cs.a;
 		int     b = cs.b < 0? -cs.b : cs.b;
 		int     c = cs.c < 0? -cs.c : cs.c;
@@ -335,11 +336,11 @@ int solver(DecorInstance sat, int* cts){
 		* eventually support neighborhoods and bitSAT
 		* eventually support neighborhood learning
 	*/
-	int* path = malloc(sizeof(int) * (sat.sat.vct+1));
-	for(int i = 0; i < (sat.sat.vct+1); i++) path[i] = 0;
+	int* path = malloc(sizeof(int) * (sat.vct+1));
+	for(int i = 0; i < (sat.vct+1); i++) path[i] = 0;
 	
 	int ix = 1;
-	while((ix > 0) && (ix <= sat.sat.vct)){
+	while((ix > 0) && (ix <= sat.vct)){
 		
 		ix--;
 	}
