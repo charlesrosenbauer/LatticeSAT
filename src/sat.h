@@ -29,6 +29,20 @@ typedef struct{
 }DecorInstance;
 
 
+/*
+	Path solver should have some heuristics for picking next variables, as well
+	as using unit propagation.
+*/
+typedef struct{
+	DecorInstance*	inst;
+	uint64_t*		pred;
+	int*			path;
+	int				fill, size;
+}PathSolver;
+
+int				unitProp		(PathSolver*, int);
+
+
 Instance		randomSAT		(int, int);
 int				checkAssignment	(Instance);
 void			printSAT		(Instance);
