@@ -40,7 +40,9 @@ typedef struct{
 	int				fill, size;
 }PathSolver;
 
+PathSolver		initPathSolver	(DecorInstance*);
 int				unitProp		(PathSolver*, int);
+int				pathSolve		(PathSolver*);
 
 
 Instance		randomSAT		(int, int);
