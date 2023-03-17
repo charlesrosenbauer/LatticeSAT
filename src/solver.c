@@ -51,7 +51,8 @@ int	unitProp(PathSolver* psol, int var){
 			}else if(ct == 0){
 				// backtrack!
 				// reset all vars in frame
-				// return 0
+				// return failing clause cid
+				return cid;
 			}
 		}
 	}
@@ -61,6 +62,19 @@ int	unitProp(PathSolver* psol, int var){
 
 
 int	pathSolve(PathSolver* psol){
-
+	DecorInstance* inst = psol->inst;
+	int ct = 1;
+	while((ct > 0) && (ct <= psol->inst->vct)){
+		// pick variable
+		int v = 0;
+		int f = unitProp(psol, v);
+		if(!f){
+			Clause c = inst->cs[f];
+			// rewind to f var
+		}
+		
+		ct--;
+	}
+	
 	return 0;
 }
