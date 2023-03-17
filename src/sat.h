@@ -35,9 +35,11 @@ typedef struct{
 */
 typedef struct{
 	DecorInstance*	inst;
+	uint64_t*		csat;
 	uint64_t*		pred;
 	int*			path;
-	int				fill, size;
+	int*			frames;
+	int				pfill, ffill;
 }PathSolver;
 
 PathSolver		initPathSolver	(DecorInstance*);

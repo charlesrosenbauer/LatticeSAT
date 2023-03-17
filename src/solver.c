@@ -23,23 +23,38 @@
 	random mutations.
 */
 
-/*
-	Path solver might need some other metadata to work well -
-	* track satisfied clauses
-	* group decisions with their propagations, undo groups at a time
-*/
+
 PathSolver initPathSolver(DecorInstance* d){
 	PathSolver ret;
 	ret.inst	= d;
+	ret.csat	= malloc(sizeof(uint64_t) * ((d->cct / 64) + 1));
+	for(int i = 0; i <= (d->cct / 64); i++) ret.csat[i] = 0;
 	ret.pred	= malloc(sizeof(uint64_t) * ((d->vct / 64) + 1));
 	ret.path	= malloc(sizeof(int     ) *   d->vct * 2);
-	ret.fill	= 0;
-	ret.size	= d->vct * 2;
+	ret.frames	= malloc(sizeof(int     ) *   d->vct * 2);
+	ret.pfill	= 0;
+	ret.ffill	= 0;
 	return ret;
 }
 
 
 int	unitProp(PathSolver* psol, int var){
+	DecorInstance* inst = psol->inst;
+	for(int i = 0; i < inst->vcsct[var]; i++){
+		int  cid = inst->varcs[var][i];
+		Clause c = inst->cs[cid];
+		if(!(psol->csat[cid/64] & (1l << (cid%64)))){
+			// check if exactly one free variable exists in the clause
+			int ct = 1;
+			if(ct == 1){
+				// propagate unit, recurse
+			}else if(ct == 0){
+				// backtrack!
+				// reset all vars in frame
+				// return 0
+			}
+		}
+	}
 	
 	return 0;
 }
