@@ -72,6 +72,109 @@ void printIntList(IntList* lst){
 }
 
 
+
+
+
+PairList makePairList(int size){
+	PairList ret;
+	ret.xs  = malloc(sizeof(Pair) * size);
+	ret.len = 0;
+	ret.cap = size;
+	return ret;
+}
+
+int growPairList(PairList* lst, int size){
+	if(lst->cap < size){
+		Pair* xs  = lst->xs;
+		lst->xs   = malloc(sizeof(Pair) * size);
+		for(int i = 0; i < lst->len; i++) lst->xs[i] = xs[i];
+		lst->cap  = size;
+		free(xs);
+	}
+	return lst->cap;
+}
+
+int appendPairList(PairList* lst, Pair x){
+	if(lst->len+5 >= lst->cap) growPairList(lst, lst->cap * 2);
+	lst->xs[lst->len] = x;
+	lst->len++;
+	return lst->len-1;
+}
+
+
+void swapPair(Pair* a, Pair* b){
+	Pair t = *a;
+	*a     = *b;
+	*b     = t;
+}
+
+void sortPairSubList(PairList* lst, int lo, int hi){
+	if(lo < hi){
+		int pivot = lst->xs[hi].a;
+		int index = lo-1;
+	
+		for(int i = lo; i < hi; i++){
+			if(lst->xs[i].a <= pivot){
+				index++;
+				swapPair(&lst->xs[index], &lst->xs[i]);
+			}
+		}
+		swapPair(&lst->xs[index+1], &lst->xs[hi]);
+		
+		
+		int p = index+1;
+		
+		sortPairSubList(lst, lo, p-1);
+		sortPairSubList(lst, p+1, hi);
+	}
+}
+
+void sortPairList(PairList* lst){
+	sortPairSubList(lst, 0, lst->len-1);
+}
+
+void printPairList(PairList lst){
+	printf("====%i/%i====\n", lst.len, lst.cap);
+	for(int i = 0; i < lst.len; i++)
+		printf("%i %i\n", lst.xs[i].a, lst.xs[i].b);
+	printf("\n");
+}
+
+
+
+
+
+
+BitList	makeBitList	(int size){
+	BitList ret;
+	ret.size   =  size;
+	ret.length = (size / 64) + ((size % 64) != 0);
+	ret.bits   = malloc(sizeof(uint64_t) * ret.length);
+	for(int i  = 0; i < ret.length; i++) ret.bits[i] = 0;
+	return ret;
+}
+
+int	checkBitList(BitList* b, int ix){
+	if((ix < 0) || (ix >= b->size)) return 0;
+	return (b->bits[ix/64] & (1l << (ix % 64))) != 0;
+}
+
+void insertBitList(BitList* b, int ix){
+	if((ix < 0) || (ix >= b->size)) return;
+	b->bits[ix/64] |=  (1l << (ix % 64));
+}
+
+void removeBitList(BitList* b, int ix){
+	if((ix < 0) || (ix >= b->size)) return;
+	b->bits[ix/64] &= ~(1l << (ix % 64));
+}
+
+
+
+
+
+
+
 uint64_t hashU64(uint64_t val){
 	uint64_t hash = val;
 	hash  = (hash * 5159830179831) - 3511938889975819;

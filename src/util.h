@@ -28,6 +28,37 @@ int     appendIntList(IntList*, int);
 void	printIntList (IntList*);
 
 
+
+typedef struct{
+	int a, b;
+}Pair;
+
+typedef struct{
+	Pair*	xs;
+	int		len, cap;
+}PairList;
+
+PairList	makePairList	(int);
+int			growPairList	(PairList*, int);
+int			appendPairList	(PairList*, Pair);
+void		sortPairList	(PairList*);
+void		printPairList	(PairList);
+
+
+
+
+typedef struct{
+	uint64_t*	bits;
+	int			size, length;
+}BitList;
+
+BitList	makeBitList		(int);
+int		checkBitList	(BitList*, int);
+void	insertBitList	(BitList*, int);
+void	removeBitList	(BitList*, int);
+
+
+
 typedef struct{
 	uint64_t	x, y;
 }Bloom128;
