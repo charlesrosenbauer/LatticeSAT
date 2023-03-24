@@ -61,13 +61,23 @@ int	unitProp(PathSolver* psol, int var){
 }
 
 
+/*
+	* pick a new variable
+	* guess its value
+	* unit propagate
+		* contradiction: rewind
+		* okay: continue
+*/
 int	pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
-	int ct = 1;
+	int ct        = 1;
+	psol->path[1] = 1;
+	
 	while((ct > 0) && (ct <= psol->inst->vct)){
 		// pick variable
-		int v = 0;
-		int f = unitProp(psol, v);
+		psol->path[ct] = 1;	// FIXME later
+		
+		int f = unitProp(psol, psol->path[ct]);
 		if(!f){
 			Clause c = inst->cs[f];
 			// rewind to f var

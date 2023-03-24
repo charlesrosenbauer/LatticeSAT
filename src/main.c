@@ -11,5 +11,6 @@ int main(){
 	DecorInstance dsat = sortInstance(sat);
 	//printDecorSAT(dsat);
 	
-	
+	PathSolver solv = initPathSolver(&dsat);
+	pathSolve(&solv);
 }
