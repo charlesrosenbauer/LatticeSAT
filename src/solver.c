@@ -88,3 +88,30 @@ int	pathSolve(PathSolver* psol){
 	
 	return 0;
 }
+
+
+
+/*
+	Trying to count the total number of solutions.
+	
+	Of course, for large SAT problems this is hard.
+	
+	Rather, it probably makes sense to measure entropy of the solution space - 
+	the number of bits required to encode the number of solutions - and likely
+	just try to place an upper bound on the solution space.
+	
+	One simple bound would be to find a minimum collection of neighborhoods
+	that fully covers the variable space, generate bit tables for each one, and
+	sum the entropy.
+	
+	Of course, this is not very effective at figuring out how these different
+	neighborhoods interact, which is also a very important factor.
+*/
+int countSolve(PathSolver* psol){
+	DecorInstance* inst = psol->inst;
+	
+	
+	return 0;
+}
+
+
