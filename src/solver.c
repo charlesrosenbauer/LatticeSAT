@@ -40,24 +40,79 @@ PathSolver initPathSolver(DecorInstance* d){
 
 int	unitProp(PathSolver* psol, int var){
 	DecorInstance* inst = psol->inst;
-	for(int i = 0; i < inst->vcsct[var]; i++){
-		int  cid = inst->varcs[var][i];
-		Clause c = inst->cs[cid];
-		if(!(psol->csat[cid/64] & (1l << (cid%64)))){
-			// check if exactly one free variable exists in the clause
-			int ct = 1;
-			if(ct == 1){
-				// propagate unit, recurse
-			}else if(ct == 0){
-				// backtrack!
-				// reset all vars in frame
-				// return failing clause cid
-				return cid;
+	IntStack stk = makeStack(64);
+	pushStack(&stk, var);
+	int ret = 0;
+	if(0){
+		end:
+		free(stk.stk);
+		return ret;
+	}
+	
+	while(stk.fill){
+		int v = popStack(&stk);
+		for(int i = 0; i < inst->vcsct[v]; i++){
+			int  cid = inst->varcs[v][i];
+			Clause c = inst->cs[cid];
+			if(!(psol->csat[cid/64] & (1l << (cid%64)))){	// is this clause open?
+				// check if exactly one free variable exists in the clause
+				int      ai = c.a < 0? -c.a : c.a;
+				int      bi = c.b < 0? -c.b : c.b;
+				int      ci = c.c < 0? -c.c : c.c;
+				uint64_t av = 1l << (ai % 64);
+				uint64_t bv = 1l << (bi % 64);
+				uint64_t cv = 1l << (ci % 64);
+				uint64_t am = c.a < 0?    0 : av;
+				uint64_t bm = c.b < 0?    0 : bv;
+				uint64_t cm = c.c < 0?    0 : cv;
+			
+				int  ct = 0;
+				int sat = 0;
+				if(!sat){
+					if(ai == v){
+						if((psol->pred[ai/64] & am) ^ am){
+							sat = 1;
+							psol->csat[cid/64] |= (1l << (cid%64));
+						}
+					}else if((psol->pred[ai/64] & am) ^ am){
+						ct++;
+					}
+				}
+				if(!sat){
+					if(bi == v){
+						if((psol->pred[bi/64] & bm) ^ bm){
+							sat = 1;
+							psol->csat[cid/64] |= (1l << (cid%64));
+						}
+					}else if((psol->pred[bi/64] & bm) ^ bm){
+						ct++;
+					}
+				}
+				if(!sat){
+					if(ci == v){
+						if((psol->pred[ci/64] & cm) ^ cm){
+							sat = 1;
+							psol->csat[cid/64] |= (1l << (cid%64));
+						}
+					}else if((psol->pred[ci/64] & cm) ^ cm){
+						ct++;
+					}
+				}
+				if(!sat && (ct == 1)){
+					// propagate unit, recurse
+				}else if(ct == 0){
+					// backtrack!
+					// reset all vars in frame
+					// return failing clause cid
+					ret = cid;
+					goto end;
+				}
 			}
 		}
 	}
 	
-	return 0;
+	ret = 0;
+	goto end;
 }
 
 
