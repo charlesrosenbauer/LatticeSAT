@@ -24,6 +24,14 @@
 */
 
 
+void printFrame(Frame f, int n){
+	printf("FRAME %04i [%08i] <%3i/128>\n", n, f.varAssume, bloom128Fill(f.bm));
+	printf("[");
+	for(int i = 0; i < f.set.fill; i++) printf("%08i, ", f.set.stk[i]);
+	printf("]\n");
+}
+
+
 PathSolver initPathSolver(DecorInstance* d){
 	PathSolver ret;
 	ret.inst	= d;
