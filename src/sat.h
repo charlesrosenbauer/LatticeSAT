@@ -35,7 +35,7 @@ typedef struct{
 */
 typedef struct{
 	Bloom128 bm;
-	IntList  set;
+	IntStack set;
 	
 	int varAssume;
 }Frame;
@@ -48,8 +48,8 @@ typedef struct{
 	uint64_t*		flip;	// if 1, failing requires a backtrack
 	
 	int*			path;
-	int*			frames;
-	int				pfill, ffill;
+	Frame*			frames;
+	int				pfill, ffill, fpeak;
 }PathSolver;
 
 PathSolver		initPathSolver	(DecorInstance*);

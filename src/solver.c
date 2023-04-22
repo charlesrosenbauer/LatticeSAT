@@ -38,9 +38,10 @@ PathSolver initPathSolver(DecorInstance* d){
 	for(int i = 0; i < vsize; i++) ret.flip[i] = 0;
 	
 	ret.path	= malloc(sizeof(int     ) *   d->vct * 2);
-	ret.frames	= malloc(sizeof(int     ) *   d->vct * 2);
+	ret.frames	= malloc(sizeof(Frame   ) *   d->vct * 2);
 	ret.pfill	= 0;
 	ret.ffill	= 0;
+	ret.fpeak	= 0;	// this stores the highest ffill reached, for memory management reasons (freeing stacks)
 	return ret;
 }
 
@@ -89,40 +90,47 @@ int	unitProp(PathSolver* psol, int var){
 				uint64_t bm = c.b < 0?    0 : bv;
 				uint64_t cm = c.c < 0?    0 : cv;
 			
+				int  vx = 0;
 				int  ct = 0;
 				int sat = 0;
 				if(!sat){
 					if(ai == v){
-						if((psol->pred[ai/64] & am) ^ am){
+						if(!((psol->pred[ai/64] & am) ^ am)){
 							sat = 1;
 							psol->csat[cid/64] |= (1l << (cid%64));
 						}
-					}else if((psol->pred[ai/64] & am) ^ am){
+					}else if(!((psol->pred[ai/64] & am) ^ am)){
 						ct++;
+						vx = ai;
 					}
 				}
 				if(!sat){
 					if(bi == v){
-						if((psol->pred[bi/64] & bm) ^ bm){
+						if(!((psol->pred[bi/64] & bm) ^ bm)){
 							sat = 1;
 							psol->csat[cid/64] |= (1l << (cid%64));
 						}
-					}else if((psol->pred[bi/64] & bm) ^ bm){
+					}else if(!((psol->pred[bi/64] & bm) ^ bm)){
 						ct++;
+						vx = bi;
 					}
 				}
 				if(!sat){
 					if(ci == v){
-						if((psol->pred[ci/64] & cm) ^ cm){
+						if(!((psol->pred[ci/64] & cm) ^ cm)){
 							sat = 1;
 							psol->csat[cid/64] |= (1l << (cid%64));
 						}
-					}else if((psol->pred[ci/64] & cm) ^ cm){
+					}else if(!((psol->pred[ci/64] & cm) ^ cm)){
 						ct++;
+						vx = ci;
 					}
 				}
 				if(!sat && (ct == 1)){
 					// propagate unit, recurse
+					
+					pushStack(&stk, vx);
+					pushStack(&psol->frames[psol->ffill].set, vx);
 				}else if(ct == 0){
 					// backtrack!
 					// reset all vars in frame
