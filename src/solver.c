@@ -27,14 +27,37 @@
 PathSolver initPathSolver(DecorInstance* d){
 	PathSolver ret;
 	ret.inst	= d;
-	ret.csat	= malloc(sizeof(uint64_t) * ((d->cct / 64) + 1));
+	int csize   = ((d->cct / 64) + 1);
+	int vsize   = ((d->vct / 64) + 1);
+	ret.csat	= malloc(sizeof(uint64_t) * csize);
 	for(int i = 0; i <= (d->cct / 64); i++) ret.csat[i] = 0;
-	ret.pred	= malloc(sizeof(uint64_t) * ((d->vct / 64) + 1));
+	ret.pred	= malloc(sizeof(uint64_t) * vsize);
+	ret.shut	= malloc(sizeof(uint64_t) * vsize);
+	ret.flip	= malloc(sizeof(uint64_t) * vsize);
+	for(int i = 0; i < vsize; i++) ret.shut[i] = 0;
+	for(int i = 0; i < vsize; i++) ret.flip[i] = 0;
+	
 	ret.path	= malloc(sizeof(int     ) *   d->vct * 2);
 	ret.frames	= malloc(sizeof(int     ) *   d->vct * 2);
 	ret.pfill	= 0;
 	ret.ffill	= 0;
 	return ret;
+}
+
+
+int assume(PathSolver* psol, int var){
+	// guess predicted value (possibly flipped), set flip, set shut
+	// if flip is flipped back to zero, return 0 (fail)
+	// not sure this logic is 100% correct
+	int      ix = var / 64;
+	uint64_t mx = 1l << (var % 64);
+	
+	psol->shut[ix] |= mx;
+	psol->flip[ix] ^= mx;
+	psol->pred[ix] ^= (psol->flip[ix] & mx);
+	
+	if(psol->flip[ix] & mx) return 1;
+	return 0;
 }
 
 
