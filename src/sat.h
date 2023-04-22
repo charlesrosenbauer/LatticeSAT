@@ -34,6 +34,13 @@ typedef struct{
 	as using unit propagation.
 */
 typedef struct{
+	Bloom128 bm;
+	IntList  set;
+	
+	int varAssume;
+}Frame;
+
+typedef struct{
 	DecorInstance*	inst;
 	uint64_t*		csat;
 	uint64_t*		pred;

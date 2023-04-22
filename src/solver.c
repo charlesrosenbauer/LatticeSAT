@@ -67,6 +67,22 @@ int	unitProp(PathSolver* psol, int var){
 	* unit propagate
 		* contradiction: rewind
 		* okay: continue
+		
+	solve :
+		pick var : x
+		assume x = 0
+		unit prop
+		if complete return SAT
+		if contradict
+			locate which prop pass set cont var
+			backtrack to prop pass
+			if prop pass = 0
+				assume pass = 1 ...
+			else
+				backtrack further
+		else
+			rescurse solve
+		
 */
 int	pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;

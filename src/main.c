@@ -7,9 +7,9 @@
 
 
 int main(){
-	Instance       sat = randomSAT(243, 64);
+	Instance       sat = randomSAT(61, 16);
 	DecorInstance dsat = sortInstance(sat);
-	//printDecorSAT(dsat);
+	printDecorSAT(dsat);
 	
 	PathSolver solv = initPathSolver(&dsat);
 	pathSolve(&solv);
