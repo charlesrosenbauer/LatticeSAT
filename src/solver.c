@@ -106,6 +106,39 @@ int	pathSolve(PathSolver* psol){
 	
 	Of course, this is not very effective at figuring out how these different
 	neighborhoods interact, which is also a very important factor.
+	
+	Some variant on a DPLL algorithm that continues searching even after
+	finding a solution should work. One recursive framing could be:
+	
+	count :
+		ct := 0
+		pick var : x
+		assume x = 0
+		unit prop
+		if complete
+			ct++
+		else if !contradiction
+			ct += count()
+		rewind
+		assume x = 1
+		unit prop
+		if complete
+			ct++
+		else if !contradiction
+			ct += count()
+		return ct
+	
+	This algorithm would suffice in theory, though in practice any problem with
+	a large number of solutions could easily be infeasible to compute. A few
+	options on resolving this:
+	
+	* Leverage BitSAT stuff to count more than 1 at a time. This probably will
+		only help so much.
+	
+	* Have a recursive depth limit and estimate/bound everything below.
+	
+	* Attempt to solve several parts of a problem independently and find some
+		way to combine them.
 */
 int countSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
