@@ -70,7 +70,8 @@ int assume(PathSolver* psol, int var){
 }
 
 
-int	unitProp(PathSolver* psol, int var){
+int	unitProp(PathSolver* psol, Frame* f){
+	int var = f->varAssume;
 	DecorInstance* inst = psol->inst;
 	IntStack stk = makeStack(64);
 	pushStack(&stk, var);
@@ -185,15 +186,27 @@ int	pathSolve(PathSolver* psol){
 	
 	while((ct > 0) && (ct <= psol->inst->vct)){
 		// pick variable
-		psol->path[ct] = 1;	// FIXME later
 		
-		int f = unitProp(psol, psol->path[ct]);
+		int pick = 1;
+		psol->path[ct] = pick;	// FIXME later
+		
+		psol->frames[psol->ffill] = (Frame){
+			.bm			= (Bloom128){0, 0},
+			.set		= makeStack(32),
+			.varAssume	= pick
+		};
+		psol->ffill++;
+		psol->fpeak = (psol->fpeak > psol->ffill)? psol->fpeak : psol->ffill;
+		
+		int f = unitProp(psol, &psol->frames[psol->ffill-1]);
 		if(!f){
 			Clause c = inst->cs[f];
 			// rewind to f var
 		}
 		
 		ct--;
+		
+		printFrame(psol->frames[psol->ffill], psol->ffill);
 	}
 	
 	return 0;

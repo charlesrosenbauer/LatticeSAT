@@ -53,7 +53,7 @@ typedef struct{
 }PathSolver;
 
 PathSolver		initPathSolver	(DecorInstance*);
-int				unitProp		(PathSolver*, int);
+int				unitProp		(PathSolver*, Frame*);
 int				pathSolve		(PathSolver*);
 
 
