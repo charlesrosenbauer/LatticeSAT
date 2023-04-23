@@ -70,6 +70,18 @@ int assume(PathSolver* psol, int var){
 }
 
 
+int checkClauseVars(Clause c, int x){
+	int ai = c.a < 0? -c.a : c.a;
+	int bi = c.b < 0? -c.b : c.b;
+	int ci = c.c < 0? -c.c : c.c;
+	return (ai == x) || (bi == x) || (ci == x);
+}
+
+int checkClauseVals(Clause c, int x){
+	return (c.a == x) || (c.b == x) || (c.c == x);
+}
+
+
 int	unitProp(PathSolver* psol, Frame* f){
 	int var = f->varAssume;
 	DecorInstance* inst = psol->inst;
@@ -82,6 +94,13 @@ int	unitProp(PathSolver* psol, Frame* f){
 		return ret;
 	}
 	
+	/*
+		I think this function needs a clean slate restart, this is a bit of a mess.
+		
+		I also need to get a more coherent idea of how the guessing system works.
+		I'm not sure the flip thing is actually necessary, it probably just needs to
+		track (possibly in frames) if a variable has any more guesses available.
+	*/
 	while(stk.fill){
 		int v = popStack(&stk);
 		for(int i = 0; i < inst->vcsct[v]; i++){
@@ -187,13 +206,14 @@ int	pathSolve(PathSolver* psol){
 	while((ct > 0) && (ct <= psol->inst->vct)){
 		// pick variable
 		
-		int pick = 1;
-		psol->path[ct] = pick;	// FIXME later
+		int pick = 1;			// FIXME later
+		psol->path[ct] = pick;
 		
 		psol->frames[psol->ffill] = (Frame){
 			.bm			= (Bloom128){0, 0},
 			.set		= makeStack(32),
-			.varAssume	= pick
+			.varAssume	= pick,	// sign of this value determines if the guess is 0 or 1
+			.guess		= 0
 		};
 		psol->ffill++;
 		psol->fpeak = (psol->fpeak > psol->ffill)? psol->fpeak : psol->ffill;
