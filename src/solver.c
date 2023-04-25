@@ -107,53 +107,17 @@ int	unitProp(PathSolver* psol, Frame* f){
 			int  cid = inst->varcs[v][i];
 			Clause c = inst->cs[cid];
 			if(!(psol->csat[cid/64] & (1l << (cid%64)))){	// is this clause open?
-				// check if exactly one free variable exists in the clause
-				int      ai = c.a < 0? -c.a : c.a;
-				int      bi = c.b < 0? -c.b : c.b;
-				int      ci = c.c < 0? -c.c : c.c;
-				uint64_t av = 1l << (ai % 64);
-				uint64_t bv = 1l << (bi % 64);
-				uint64_t cv = 1l << (ci % 64);
-				uint64_t am = c.a < 0?    0 : av;
-				uint64_t bm = c.b < 0?    0 : bv;
-				uint64_t cm = c.c < 0?    0 : cv;
-			
-				int  vx = 0;
-				int  ct = 0;
-				int sat = 0;
-				if(!sat){
-					if(ai == v){
-						if(!((psol->pred[ai/64] & am) ^ am)){
-							sat = 1;
-							psol->csat[cid/64] |= (1l << (cid%64));
-						}
-					}else if(!((psol->pred[ai/64] & am) ^ am)){
-						ct++;
-						vx = ai;
-					}
-				}
-				if(!sat){
-					if(bi == v){
-						if(!((psol->pred[bi/64] & bm) ^ bm)){
-							sat = 1;
-							psol->csat[cid/64] |= (1l << (cid%64));
-						}
-					}else if(!((psol->pred[bi/64] & bm) ^ bm)){
-						ct++;
-						vx = bi;
-					}
-				}
-				if(!sat){
-					if(ci == v){
-						if(!((psol->pred[ci/64] & cm) ^ cm)){
-							sat = 1;
-							psol->csat[cid/64] |= (1l << (cid%64));
-						}
-					}else if(!((psol->pred[ci/64] & cm) ^ cm)){
-						ct++;
-						vx = ci;
-					}
-				}
+				
+				int sat = 1;
+				int ct  = 1;
+				int vx  = 0;
+				/*
+					check cases:
+					* clause is satisfied by new assumption
+					* clause is unsatisfied and has exactly one free variable (propagate)
+					* clause is unsatisfied and has no free variables (backtrack)
+				*/
+				
 				if(!sat && (ct == 1)){
 					// propagate unit, recurse
 					
@@ -200,14 +164,19 @@ int	unitProp(PathSolver* psol, Frame* f){
 */
 int	pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
-	int ct        = 1;
-	psol->path[1] = 1;
+	int ct			= 1;
+	int fill		= 0;
+	psol->path[1]	= 1;
 	
-	while((ct > 0) && (ct <= psol->inst->vct)){
+	while((ct > 0) && (fill <= psol->inst->vct)){
 		// pick variable
-		
-		int pick = 1;			// FIXME later
+		int pick = (rng() % psol->inst->vct)+1;
+		while(psol->shut[pick/64] & (1l << (pick%64))){
+			pick++;
+			pick = (pick <= psol->inst->vct)? pick : 1;
+		}
 		psol->path[ct] = pick;
+		fill++;
 		
 		psol->frames[psol->ffill] = (Frame){
 			.bm			= (Bloom128){0, 0},
@@ -222,6 +191,15 @@ int	pathSolve(PathSolver* psol){
 		if(!f){
 			Clause c = inst->cs[f];
 			// rewind to f var
+			
+			int rewind = 1;
+			
+			for(int i = 0; i < rewind; i++){
+				fill -= psol->frames[psol->ffill].set.fill;
+				psol->ffill--;
+			}
+		}else{
+			fill += psol->frames[psol->ffill].set.fill;
 		}
 		
 		ct--;
