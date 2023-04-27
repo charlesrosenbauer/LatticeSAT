@@ -99,14 +99,19 @@ int	unitProp(PathSolver* psol, Frame* f){
 		I'm not sure the flip thing is actually necessary, it probably just needs to
 		track (possibly in frames) if a variable has any more guesses available.
 	*/
+	int iter = 0;
 	while(stk.fill){
-		int v = popStack(&stk);
-		psol->shut[v/64] |=  (1l << (v%64));
-		psol->pred[v/64] &= ~(1l << (v%64));
-		psol->pred[v/64] |=  (v < 0)? 0 : (1l << (v%64));
+		int v  = popStack(&stk);
+		int vi = v < 0? -v : v;
+		if(iter) printf("\nprop: %i\n", v);
+	
+		iter++;
+		psol->shut[vi/64] |=  (1l << (v%64));
+		psol->pred[vi/64] &= ~(1l << (v%64));
+		psol->pred[vi/64] |=  (v < 0)? 0 : (1l << (v%64));
 		
-		for(int i = 0; i < inst->vcsct[v]; i++){
-			int  cid = inst->varcs[v][i];
+		for(int i = 0; i < inst->vcsct[vi]; i++){
+			int  cid = inst->varcs[vi][i];
 			Clause c = inst->cs[cid];
 			if(!(psol->csat[cid/64] & (1l << (cid%64)))){	// is this clause open?
 				int      ai = c.a < 0? -c.a : c.a;
@@ -120,7 +125,7 @@ int	unitProp(PathSolver* psol, Frame* f){
 				uint64_t cx = c.c < 0? 0 : cm;
 				
 				int sat = 0;
-				int ct  = 1;
+				int ct  = 0;
 				int vx  = 0;
 				
 				if      (!sat && (c.a == v)){
@@ -128,7 +133,7 @@ int	unitProp(PathSolver* psol, Frame* f){
 					sat = 1;
 				}else if(!sat && (psol->shut[ai/64] & am)){
 					if(!((psol->pred[ai/64] ^ ax) & am)) sat = 2;
-				}else if(!sat){
+				}else if(!sat && (c.a != -v)){
 					ct++;
 					vx = c.a;
 				}
@@ -138,7 +143,7 @@ int	unitProp(PathSolver* psol, Frame* f){
 					sat = 1;
 				}else if(!sat && (psol->shut[bi/64] & bm)){
 					if(!((psol->pred[bi/64] ^ bx) & bm)) sat = 2;
-				}else if(!sat){
+				}else if(!sat && (c.b != -v)){
 					ct++;
 					vx = c.b;
 				}
@@ -148,7 +153,7 @@ int	unitProp(PathSolver* psol, Frame* f){
 					sat = 1;
 				}else if(!sat && (psol->shut[ci/64] & cm)){
 					if(!((psol->pred[ci/64] ^ cx) & cm)) sat = 2;
-				}else if(!sat){
+				}else if(!sat && (c.c != -v)){
 					ct++;
 					vx = c.c;
 				}
@@ -160,13 +165,14 @@ int	unitProp(PathSolver* psol, Frame* f){
 					* clause is unsatisfied and has no free variables (backtrack)
 				*/
 				printf("%i %i %i [%c]\n", c.a, c.b, c.c, sat? 'X' : '_');
-				printf("  %i %i %i\n", asat, bsat, csat);
+				printf("  %i %i %i : %i %i\n", asat, bsat, csat, ct, vx);
 				if(!sat && (ct == 1)){
 					// propagate unit, recurse
 					
 					pushStack(&stk, vx);
 					pushStack(&psol->frames[psol->ffill].set, vx);
-				}else if(ct == 0){
+					printf("--> %i\n", vx);
+				}else if(!sat && (ct == 0)){
 					// backtrack!
 					// reset all vars in frame
 					// return failing clause cid
