@@ -101,6 +101,10 @@ int	unitProp(PathSolver* psol, Frame* f){
 	*/
 	while(stk.fill){
 		int v = popStack(&stk);
+		psol->shut[v/64] |=  (1l << (v%64));
+		psol->pred[v/64] &= ~(1l << (v%64));
+		psol->pred[v/64] |=  (v < 0)? 0 : (1l << (v%64));
+		
 		for(int i = 0; i < inst->vcsct[v]; i++){
 			int  cid = inst->varcs[v][i];
 			Clause c = inst->cs[cid];
@@ -123,29 +127,32 @@ int	unitProp(PathSolver* psol, Frame* f){
 					psol->csat[cid/64] |= (1l << (cid%64));
 					sat = 1;
 				}else if(!sat && (psol->shut[ai/64] & am)){
-					if(!((psol->pred[ai/64] ^ ax) & am)) sat = 1;
+					if(!((psol->pred[ai/64] ^ ax) & am)) sat = 2;
 				}else if(!sat){
 					ct++;
 					vx = c.a;
 				}
+				int asat = sat;
 				if(!sat && (c.b == v)){
 					psol->csat[cid/64] |= (1l << (cid%64));
 					sat = 1;
 				}else if(!sat && (psol->shut[bi/64] & bm)){
-					if(!((psol->pred[bi/64] ^ bx) & bm)) sat = 1;
+					if(!((psol->pred[bi/64] ^ bx) & bm)) sat = 2;
 				}else if(!sat){
 					ct++;
 					vx = c.b;
 				}
+				int bsat = sat;
 				if(!sat && (c.c == v)){
 					psol->csat[cid/64] |= (1l << (cid%64));
 					sat = 1;
 				}else if(!sat && (psol->shut[ci/64] & cm)){
-					if(!((psol->pred[ci/64] ^ cx) & cm)) sat = 1;
+					if(!((psol->pred[ci/64] ^ cx) & cm)) sat = 2;
 				}else if(!sat){
 					ct++;
 					vx = c.c;
 				}
+				int csat = sat;
 				/*
 					check cases:
 					* clause is satisfied by new assumption
@@ -153,6 +160,7 @@ int	unitProp(PathSolver* psol, Frame* f){
 					* clause is unsatisfied and has no free variables (backtrack)
 				*/
 				printf("%i %i %i [%c]\n", c.a, c.b, c.c, sat? 'X' : '_');
+				printf("  %i %i %i\n", asat, bsat, csat);
 				if(!sat && (ct == 1)){
 					// propagate unit, recurse
 					
