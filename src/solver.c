@@ -104,11 +104,22 @@ int	unitProp(PathSolver* psol, Frame* f){
 		int v  = popStack(&stk);
 		int vi = v < 0? -v : v;
 		if(iter) printf("\nprop: %i\n", v);
+		
+		if(psol->shut[vi/64] & (1l << (vi%64))){
+			uint64_t vm = (1l << (vi%64));
+			uint64_t vx = v < 0? 0 : vm;
+			if(!((psol->pred[vi/64] ^ vx) & vm)){
+				// backtrack!
+				printf("BACKTRACK\n");
+				ret = 0;
+				goto end;
+			}
+		}
 	
 		iter++;
-		psol->shut[vi/64] |=  (1l << (v%64));
-		psol->pred[vi/64] &= ~(1l << (v%64));
-		psol->pred[vi/64] |=  (v < 0)? 0 : (1l << (v%64));
+		psol->shut[vi/64] |=  (1l << (vi%64));
+		psol->pred[vi/64] &= ~(1l << (vi%64));
+		psol->pred[vi/64] |=  (v < 0)? 0 : (1l << (vi%64));
 		
 		for(int i = 0; i < inst->vcsct[vi]; i++){
 			int  cid = inst->varcs[vi][i];
@@ -176,6 +187,7 @@ int	unitProp(PathSolver* psol, Frame* f){
 					// backtrack!
 					// reset all vars in frame
 					// return failing clause cid
+					printf("BACKTRACK\n");
 					ret = cid;
 					goto end;
 				}
