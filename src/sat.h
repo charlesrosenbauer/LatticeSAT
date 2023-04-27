@@ -46,9 +46,8 @@ typedef struct{
 	uint64_t*		shut;	// currently assumed
 	uint64_t*		flip;	// if 1, failing requires a backtrack
 	
-	int*			path;
 	Frame*			frames;
-	int				pfill, ffill, fpeak;
+	int				ffill, fpeak;
 }PathSolver;
 
 PathSolver		initPathSolver	(DecorInstance*);

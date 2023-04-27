@@ -45,9 +45,7 @@ PathSolver initPathSolver(DecorInstance* d){
 	for(int i = 0; i < vsize; i++) ret.shut[i] = 0;
 	for(int i = 0; i < vsize; i++) ret.flip[i] = 0;
 	
-	ret.path	= malloc(sizeof(int     ) *   d->vct * 2);
 	ret.frames	= malloc(sizeof(Frame   ) *   d->vct * 2);
-	ret.pfill	= 0;
 	ret.ffill	= 0;
 	ret.fpeak	= 0;	// this stores the highest ffill reached, for memory management reasons (freeing stacks)
 	return ret;
@@ -164,18 +162,18 @@ int	unitProp(PathSolver* psol, Frame* f){
 */
 int	pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
-	int ct			= 1;
 	int fill		= 0;
-	psol->path[1]	= 1;
+	psol->ffill		= 1;
 	
-	while((ct > 0) && (fill <= psol->inst->vct)){
+	while((psol->ffill > 0) && (fill < psol->inst->vct)){
 		// pick variable
 		int pick = (rng() % psol->inst->vct)+1;
 		while(psol->shut[pick/64] & (1l << (pick%64))){
 			pick++;
 			pick = (pick <= psol->inst->vct)? pick : 1;
 		}
-		psol->path[ct] = pick;
+		printf("%i\n", pick);
+		psol->shut[pick/64] |= (1l << pick%64);
 		fill++;
 		
 		psol->frames[psol->ffill] = (Frame){
@@ -201,8 +199,6 @@ int	pathSolve(PathSolver* psol){
 		}else{
 			fill += psol->frames[psol->ffill].set.fill;
 		}
-		
-		ct--;
 		
 		printFrame(psol->frames[psol->ffill], psol->ffill);
 	}
