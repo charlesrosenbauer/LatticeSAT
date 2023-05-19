@@ -80,7 +80,14 @@ int checkClauseVals(Clause c, int x){
 	return (c.a == x) || (c.b == x) || (c.c == x);
 }
 
-
+/*
+	Next steps for sat solver:
+	* build a unit propagation solver that is as simple as possible
+	* save path solving for lattice solver
+	* build primitive semi-recursive count solver
+	* build lattice solver, bit manipulation code
+	* make all this interactive and visual
+*/
 int unitProp(){
 	return 0;
 }
