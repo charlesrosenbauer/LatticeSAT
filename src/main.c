@@ -12,5 +12,5 @@ int main(){
 	printDecorSAT(dsat);
 	
 	PathSolver solv = initPathSolver(&dsat);
-	pathSolve(&solv);
+	printf("SAT=%i/%i\n", pathSolve(&solv), dsat.cct);
 }

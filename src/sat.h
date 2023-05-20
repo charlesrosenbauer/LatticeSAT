@@ -43,6 +43,7 @@ typedef struct{
 	DecorInstance*	inst;
 	uint64_t*		csat;
 	uint64_t*		bits;
+	int*			infers;
 	
 	Frame*			frames;
 	int				ffill, fpeak;
