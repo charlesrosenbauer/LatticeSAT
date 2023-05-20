@@ -25,7 +25,7 @@
 
 
 void printFrame(Frame f, int n){
-	printf("FRAME %04i [%08i] <%3i/128>\n", n, f.varAssume, bloom128Fill(f.bm));
+	printf("FRAME %04i [%08i] <%3i/128>\n", n, f.guess, bloom128Fill(f.bm));
 	printf("[");
 	//for(int i = 0; i < f.set.fill; i++) printf("%08i, ", f.set.stk[i]);
 	printf("]\n");
@@ -46,7 +46,7 @@ PathSolver initPathSolver(DecorInstance* d){
 	
 	for(int i = 0; i <    cct; i++) ret.csat  [i] =  0;
 	for(int i = 0; i <    vct; i++) ret.bits  [i] =  0;
-	for(int i = 0; i < d->vct; i++) ret.frames[i] = (Frame){(Bloom128){0,0}, makeStack(32), -1, -1};
+	for(int i = 0; i < d->vct; i++) ret.frames[i] = (Frame){(Bloom128){0,0}, makeStack(32), -1};
 	for(int i = 0; i < d->vct; i++) ret.infers[i] = -1;
 	
 	return ret;
@@ -81,8 +81,9 @@ int unitProp(PathSolver* psol, Frame* f){
 		int v  = popStack(&stk);
 		int vi = v<0? -v : v;
 		printf("V=%i\n", vi);
-		if(psol->infers[vi] < 0){
-			for(int  i = 0; i < inst->vcsct[i]; i++){
+		if((psol->infers[vi] < 0) || (v == f->guess)){
+			printf("  ; %i\n", inst->vcsct[vi]);
+			for(int  i = 0; i < inst->vcsct[vi]; i++){
 				int ci = inst->varcs[vi][i];
 				Clause cs = inst->cs[ci];
 				// is clause satisfied?
@@ -91,6 +92,32 @@ int unitProp(PathSolver* psol, Frame* f){
 					printf("  CI=%i\n", ci);
 				}else{
 					// clause is not satisfied, decide on potential propagation
+					int ax = cs.a<0? -cs.a : cs.a;
+					int bx = cs.b<0? -cs.b : cs.b;
+					int cx = cs.c<0? -cs.c : cs.c;
+					
+					int ct = 0;
+					ct += (psol->infers[ax] < 0);
+					ct += (psol->infers[bx] < 0);
+					ct += (psol->infers[cx] < 0);
+					if(ct == 1){
+						// this needs to handle more complex cases
+						if(psol->infers[ax] < 0){
+							pushStack(&stk, cs.a);
+							psol->infers[ax] = psol->ffill-1;
+							printf("push %i\n", cs.a);
+						}
+						if(psol->infers[bx] < 0){
+							pushStack(&stk, cs.b);
+							psol->infers[bx] = psol->ffill-1;
+							printf("push %i\n", cs.b);
+						}
+						if(psol->infers[cx] < 0){
+							pushStack(&stk, cs.c);
+							psol->infers[cx] = psol->ffill-1;
+							printf("push %i\n", cs.c);
+						}
+					}
 				}
 			}
 		}else{
@@ -108,14 +135,13 @@ int pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
 	for(int i = 1; i < inst->vct; i++){
 		psol->bits[i/64] |= 1l << (i%64);
-		for(int j = 0; j < inst->vcsct[i]; j++){
-			int    ci = inst->varcs[i][j];
-			Clause cs = inst->cs[ci];
-			int    vi = -i;
-			if((cs.a == vi) || (cs.b == vi) || (cs.c == vi)){
-				psol->csat[ci/64] |= 1l << (ci%64);
-			}
-		}
+		psol->frames[psol->ffill] = (Frame){
+			.prop.fill = 0,
+			.guess     = i
+		};
+		psol->infers[i] = inst->cct+1;
+		psol->ffill++;
+		unitProp(psol, &psol->frames[psol->ffill-1]);
 	}
 	
 	int sat = 0;

@@ -36,7 +36,7 @@ typedef struct{
 typedef struct{
 	Bloom128	bm;
 	IntStack	prop;
-	int32_t		varAssume, guess;
+	int32_t		guess;
 }Frame;
 
 typedef struct{
