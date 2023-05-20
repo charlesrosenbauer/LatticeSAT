@@ -80,6 +80,12 @@ int unitProp(PathSolver* psol, Frame* f){
 	while(stk.fill){
 		int v  = popStack(&stk);
 		int vi = v<0? -v : v;
+		
+		if(v != f->guess){
+			pushStack(&f->prop, v);
+			psol->infers[vi] = psol->ffill-1;
+		}
+		
 		printf("V=%i\n", vi);
 		if((psol->infers[vi] < 0) || (v == f->guess)){
 			printf("  ; %i\n", inst->vcsct[vi]);
@@ -104,17 +110,14 @@ int unitProp(PathSolver* psol, Frame* f){
 						// this needs to handle more complex cases
 						if(psol->infers[ax] < 0){
 							pushStack(&stk, cs.a);
-							psol->infers[ax] = psol->ffill-1;
 							printf("push %i\n", cs.a);
 						}
 						if(psol->infers[bx] < 0){
 							pushStack(&stk, cs.b);
-							psol->infers[bx] = psol->ffill-1;
 							printf("push %i\n", cs.b);
 						}
 						if(psol->infers[cx] < 0){
 							pushStack(&stk, cs.c);
-							psol->infers[cx] = psol->ffill-1;
 							printf("push %i\n", cs.c);
 						}
 					}
@@ -134,14 +137,18 @@ int unitProp(PathSolver* psol, Frame* f){
 int pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
 	for(int i = 1; i < inst->vct; i++){
-		psol->bits[i/64] |= 1l << (i%64);
-		psol->frames[psol->ffill] = (Frame){
-			.prop.fill = 0,
-			.guess     = i
-		};
-		psol->infers[i] = inst->cct+1;
-		psol->ffill++;
-		unitProp(psol, &psol->frames[psol->ffill-1]);
+		if(psol->infers[i] < 0){
+			psol->bits[i/64] |= 1l << (i%64);
+			psol->frames[psol->ffill] = (Frame){
+				.prop.fill = 0,
+				.guess     = i
+			};
+			psol->infers[i] = inst->cct+1;
+			psol->ffill++;
+			if(!unitProp(psol, &psol->frames[psol->ffill-1])){
+				printf("BACKTRACK!\n");
+			}
+		}
 	}
 	
 	int sat = 0;
