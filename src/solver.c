@@ -73,15 +73,44 @@ int checkClauseVals(Clause c, int x){
 	* make all this interactive and visual
 */
 int unitProp(PathSolver* psol, Frame* f){
-	return 0;
+	DecorInstance* inst = psol->inst;
+	IntStack        stk = makeStack(32);
+	pushStack(&stk, f->guess);	
+	
+	while(stk.fill){
+		int v  = popStack(&stk);
+		int vi = v<0? -v : v;
+		printf("V=%i\n", vi);
+		if(psol->infers[vi] < 0){
+			for(int  i = 0; i < inst->vcsct[i]; i++){
+				int ci = inst->varcs[vi][i];
+				Clause cs = inst->cs[ci];
+				// is clause satisfied?
+				if((psol->csat[ci/64] & (1l << (ci%64))) || (cs.a == v) || (cs.b == v) || (cs.c == v)){
+					psol->csat[ci/64] |= 1l << (ci%64);
+					printf("  CI=%i\n", ci);
+				}else{
+					// clause is not satisfied, decide on potential propagation
+				}
+			}
+		}else{
+			// contradiction!
+			f->prop.fill = 0;
+			free(stk.stk);
+			return 0;
+		}
+	}
+	
+	return f->prop.fill;
 }
 
 int pathSolve(PathSolver* psol){
-	for(int i = 1; i < psol->inst->vct; i++){
+	DecorInstance* inst = psol->inst;
+	for(int i = 1; i < inst->vct; i++){
 		psol->bits[i/64] |= 1l << (i%64);
-		for(int j = 0; j < psol->inst->vcsct[i]; j++){
-			int    ci = psol->inst->varcs[i][j];
-			Clause cs = psol->inst->cs[ci];
+		for(int j = 0; j < inst->vcsct[i]; j++){
+			int    ci = inst->varcs[i][j];
+			Clause cs = inst->cs[ci];
 			int    vi = -i;
 			if((cs.a == vi) || (cs.b == vi) || (cs.c == vi)){
 				psol->csat[ci/64] |= 1l << (ci%64);
@@ -90,7 +119,7 @@ int pathSolve(PathSolver* psol){
 	}
 	
 	int sat = 0;
-	for(int i = 0; i < (psol->inst->cct/64)+1; i++)
+	for(int i = 0; i < (inst->cct/64)+1; i++)
 		sat += __builtin_popcountl(psol->csat[i]);
 	return sat;
 }
