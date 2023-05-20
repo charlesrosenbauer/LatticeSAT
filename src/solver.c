@@ -138,6 +138,26 @@ int pathSolve(PathSolver* psol){
 	DecorInstance* inst = psol->inst;
 	for(int i = 1; i < inst->vct; i++){
 		if(psol->infers[i] < 0){
+		
+			int n = 0;
+			printf("SET   : ");
+			for(int j = 1; j < inst->vct; j++){
+				if(psol->infers[j] >= 0){
+					printf("%i ", (psol->bits[j/64] & (1l << (j%64)))? j : -j);
+					n++;
+				}
+			}
+			printf("    [[%i]]\nUNSAT : ", n);
+			n = 0;
+			for(int j = 0; j < inst->cct; j++){
+				if(!(psol->csat[j/64] & (1l << (j%64)))){
+					printf("[%i %i %i] ", inst->cs[j].a, inst->cs[j].b, inst->cs[j].c);
+					n++;
+				}
+			}
+			printf("    [[%i]]\n", n);
+		
+		
 			psol->bits[i/64] |= 1l << (i%64);
 			psol->frames[psol->ffill] = (Frame){
 				.prop.fill = 0,
