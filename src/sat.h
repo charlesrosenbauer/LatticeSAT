@@ -34,17 +34,15 @@ typedef struct{
 	as using unit propagation.
 */
 typedef struct{
-	Bloom128 bm;
-	IntStack set;
-	int32_t varAssume, guess;
+	Bloom128	bm;
+	IntStack	prop;
+	int32_t		varAssume, guess;
 }Frame;
 
 typedef struct{
 	DecorInstance*	inst;
 	uint64_t*		csat;
-	uint64_t*		pred;	// predicted/current value
-	uint64_t*		shut;	// currently assumed
-	uint64_t*		flip;	// if 1, failing requires a backtrack
+	uint64_t*		bits;
 	
 	Frame*			frames;
 	int				ffill, fpeak;
