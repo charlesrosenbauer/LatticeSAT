@@ -49,6 +49,38 @@ typedef struct{
 	int				ffill, fpeak;
 }PathSolver;
 
+
+
+typedef struct{
+	uint64_t	bits[4];
+}B256;
+
+typedef struct{
+	uint64_t	bits[16];
+}B1024;
+
+
+typedef struct{
+	int32_t		vars[8];
+}NH8;
+
+typedef struct{
+	int32_t		vars[10];
+}NH10;
+
+typedef struct{
+	B256*		b256s;
+	B1024*		b1024s;
+	
+	NH8*		n8s;
+	NH10*		n10s;
+	
+	int			fill8, fill10, size8, size10;
+}NeighborhoodTable;
+
+
+
+
 PathSolver		initPathSolver	(DecorInstance*);
 int				unitProp		(PathSolver*, Frame*);
 int				pathSolve		(PathSolver*);
