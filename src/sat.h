@@ -78,6 +78,9 @@ typedef struct{
 	int			fill8, fill10, size8, size10;
 }NeighborhoodTable;
 
+NeighborhoodTable	makeNHTab	(int, int);
+int					insertNH8	(NeighborhoodTable*, NH8 , B256 );
+int					insertNH10	(NeighborhoodTable*, NH10, B1024);
 
 
 

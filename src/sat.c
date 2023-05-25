@@ -7,6 +7,42 @@
 #include "util.h"
 
 
+/*
+	Building neighborhood tables should be mostly randomized, with a focus on
+	having a complete coverage of the SAT instance while minimizing total
+	entropy.
+*/
+NeighborhoodTable makeNHTab(int size8, int size10){
+	NeighborhoodTable ret;
+	ret.b256s  = malloc(sizeof(B256 ) * size8 );
+	ret.n8s    = malloc(sizeof(NH8  ) * size8 );
+	ret.size8  = size8;
+	ret.fill8  = 0;
+	
+	ret.b1024s = malloc(sizeof(B1024) * size10);
+	ret.n10s   = malloc(sizeof(NH10 ) * size10);
+	ret.size10 = size10;
+	ret.fill10 = 0;
+
+	return ret;
+}
+
+
+int insertNH8(NeighborhoodTable* ntab, NH8 n, B256 b){
+	
+	return -1;
+}
+
+
+int insertNH10(NeighborhoodTable* ntab, NH10 n, B1024 b){
+
+	return -1;
+}
+
+
+
+
+
 void printHistogram(int* xs, int ct){
 	float max = xs[0];
 	for(int i = 1; i < ct; i++) max = (max < xs[i])? xs[i] : max;
