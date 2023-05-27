@@ -47,6 +47,8 @@ typedef struct{
 	
 	Frame*			frames;
 	int				ffill, fpeak;
+	
+	uint64_t		iterct;
 }PathSolver;
 
 
@@ -86,7 +88,7 @@ int					insertNH10	(NeighborhoodTable*, NH10, B1024);
 
 PathSolver		initPathSolver	(DecorInstance*);
 int				unitProp		(PathSolver*, Frame*);
-int				pathSolve		(PathSolver*);
+int				pathSolve		(PathSolver*, int);
 
 
 Instance		randomSAT		(int, int);

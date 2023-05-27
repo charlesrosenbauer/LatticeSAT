@@ -134,8 +134,22 @@ int unitProp(PathSolver* psol, Frame* f){
 	return f->prop.fill;
 }
 
-int pathSolve(PathSolver* psol){
+int pathSolve(PathSolver* psol, int iterations){
+	int sat = 0;
+
 	DecorInstance* inst = psol->inst;
+	for(int i = 0; i < iterations; i++){
+		
+		
+		psol->iterct++;
+	}
+	
+	// Uncertain SAT status
+	// return  1 if   SAT
+	// return -1 if UNSAT
+	return 0;
+	
+	/*
 	for(int i = 1; i < inst->vct; i++){
 		if(psol->infers[i] < 0){
 		
@@ -174,7 +188,7 @@ int pathSolve(PathSolver* psol){
 	int sat = 0;
 	for(int i = 0; i < (inst->cct/64)+1; i++)
 		sat += __builtin_popcountl(psol->csat[i]);
-	return sat;
+	return sat;*/
 }
 
 int countSolve(){
