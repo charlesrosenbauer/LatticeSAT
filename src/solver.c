@@ -144,10 +144,26 @@ int pathSolve(PathSolver* psol, int iterations){
 		psol->iterct++;
 	}
 	
+	
+	int match = 0;
+	for(int i = 0; i < inst->cct; i++){
+		Clause   cs = inst->cs[i];
+		int      ai = (cs.a < 0)? -cs.a : cs.a;
+		int      bi = (cs.b < 0)? -cs.b : cs.b;
+		int      ci = (cs.c < 0)? -cs.c : cs.c;
+		uint64_t ax = (cs.a < 0)? 0 : (1l << (ai % 64));
+		uint64_t bx = (cs.b < 0)? 0 : (1l << (bi % 64));
+		uint64_t cx = (cs.c < 0)? 0 : (1l << (ci % 64));
+		
+		match += ((psol->bits[ai/64] & (1l << (ai%64))) == ax)
+		||       ((psol->bits[bi/64] & (1l << (bi%64))) == bx)
+		||       ((psol->bits[ci/64] & (1l << (ci%64))) == cx);
+	}
+	
 	// Uncertain SAT status
 	// return  1 if   SAT
 	// return -1 if UNSAT
-	return 0;
+	return match;
 	
 	/*
 	for(int i = 1; i < inst->vct; i++){
