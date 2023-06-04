@@ -8,7 +8,23 @@
 #include "SDL/SDL.h"
 
 
-
+/*
+	TODO:
+	
+	Visualization:
+	* diagnostics
+		* bits/clauses/neighborhoods touched
+		* bits/clauses/neighborhood  heatmap
+		* bits/clauses/neighborhoods propagated
+		* heuristic accuracy
+		* hard cores
+	* interactivity
+	* bit sorting
+	
+	Solver:
+	* lattice solver
+	* WFC
+*/
 int main(){
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Surface* screen = SDL_SetVideoMode(1024, 512, 32, 0);
@@ -36,14 +52,19 @@ int main(){
 	
 	int mx   = 0;
 	int my   = 0;
+	int click= 0;
 	int cont = 1;
 	while(cont){
+		click = 0;
 		SDL_Event e;
 		while(SDL_PollEvent(&e)){
 			if(e.type == SDL_QUIT) cont = 0;
 			if(e.type == SDL_MOUSEMOTION){
 				mx = e.motion.x;
 				my = e.motion.y;
+			}
+			if(e.type == SDL_MOUSEBUTTONDOWN){
+				click = 1;
 			}
 		}
 		
@@ -68,8 +89,10 @@ int main(){
 		}
 		
 		for(int i = 0; i < bl.fill; i++) drawBox(pix, 512, 1024, bl.bs[i]);
-		int f = checkBox(bl, mx, my);
-		if (f) printf("%i\n", f);
+		if(click){
+			int f = checkBox(bl, mx, my);
+			if (f) printf("%i\n", f);
+		}
 		
 		printf("SAT=%i/%i\n", pathSolve(&solv, 100), dsat.cct);
 	
