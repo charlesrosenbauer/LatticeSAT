@@ -43,3 +43,18 @@ uint32_t checkBox(BoxList bl, int x, int y){
 		if(insideBox(bl.bs[i], x, y)) return bl.bs[i].func;
 	return 0;
 }
+
+
+
+void drawBox(uint32_t* px, int h, int w, Box b){
+	for(int i = 0; i < b.h; i++){
+		int y = i + b.y;
+		if((y >= 0) && (y < h)){
+			for(int j = 0; j < b.w; j++){
+				int x = j + b.x;
+				int n = (y * w) + x;
+				if((x >= 0) || (x <= w)) px[n] = b.color;
+			}
+		}
+	}
+}

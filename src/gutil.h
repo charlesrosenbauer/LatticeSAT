@@ -23,6 +23,8 @@ int			insideBox	(Box, int, int);
 int			appendBox	(BoxList*, Box);
 uint32_t	checkBox	(BoxList , int, int);
 
+void		drawBox		(uint32_t*, int, int, Box);
+
 
 
 #endif

@@ -3,6 +3,7 @@
 
 #include "sat.h"
 #include "util.h"
+#include "gutil.h"
 
 #include "SDL/SDL.h"
 
@@ -27,6 +28,10 @@ int main(){
 	}
 	printf("RT = %i\n", n);
 	int scale = 512 / n;
+	
+	BoxList bl = initBoxList(16);
+	appendBox(&bl, (Box){8, 16, 1000,  4, 0x7f7f7f, 1});
+	appendBox(&bl, (Box){8, 16, 1000, 16, 0x7f7f7f, 2});
 	
 	
 	int mx   = 0;
@@ -61,6 +66,10 @@ int main(){
 				ix++;
 			}
 		}
+		
+		for(int i = 0; i < bl.fill; i++) drawBox(pix, 512, 1024, bl.bs[i]);
+		int f = checkBox(bl, mx, my);
+		if (f) printf("%i\n", f);
 		
 		printf("SAT=%i/%i\n", pathSolve(&solv, 100), dsat.cct);
 	
