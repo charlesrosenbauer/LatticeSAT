@@ -1,3 +1,4 @@
+#include "string.h"
 #include "stdint.h"
 #include "stdio.h"
 
@@ -27,7 +28,9 @@
 */
 int main(){
 	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Surface* screen = SDL_SetVideoMode(1024, 512, 32, 0);
+	SDL_Surface* screen = SDL_SetVideoMode(1024, 640, 32, 0);
+	Img img = (Img){screen->pixels, 640, 1024};
+	Img font= makeFont();
 
 	Instance       sat = randomSAT(976, 256);
 	DecorInstance dsat = sortInstance(sat);
@@ -49,6 +52,8 @@ int main(){
 	appendBox(&bl, (Box){8, 16, 1000,  4, 0x7f7f7f, 1});
 	appendBox(&bl, (Box){8, 16, 1000, 16, 0x7f7f7f, 2});
 	
+	char msg[256];
+	strcpy(msg, "default");
 	
 	int mx   = 0;
 	int my   = 0;
@@ -88,13 +93,16 @@ int main(){
 			}
 		}
 		
+		for(int i = 524288; i < 655360; i++) pix[i] = 0x3f3f3f;
+		
 		for(int i = 0; i < bl.fill; i++) drawBox(pix, 512, 1024, bl.bs[i]);
 		if(click){
 			int f = checkBox(bl, mx, my);
-			if (f) printf("%i\n", f);
+			if (f) sprintf(msg, "%i\n", f);
 		}
 		
-		printf("SAT=%i/%i\n", pathSolve(&solv, 100), dsat.cct);
+		//printf("SAT=%i/%i\n", pathSolve(&solv, 100), dsat.cct);
+		drawText(img, font, msg, strlen(msg), 520, 16);
 	
 		SDL_Flip(screen);
 		SDL_Delay(30);
