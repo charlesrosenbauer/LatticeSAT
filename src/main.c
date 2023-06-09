@@ -5,6 +5,7 @@
 #include "sat.h"
 #include "util.h"
 #include "gutil.h"
+#include "graph.h"
 
 #include "SDL/SDL.h"
 
@@ -108,4 +109,7 @@ int main(){
 		SDL_Delay(30);
 	}
 	SDL_Quit();
+	
+	Graph gp = randomGraph(128, 40);
+	printGraph(gp);
 }

@@ -187,7 +187,7 @@ int checkBloom128(Bloom128 b, uint64_t hash){
 	hash = hashU64(hash);
 	uint64_t x = 1l << ((hash >>  5) % 64);
 	uint64_t y = 1l << ((hash >> 17) % 64);
-	return (b.x & x) | (b.y & y);
+	return (b.x & x) && (b.y & y);
 }
 
 
