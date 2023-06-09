@@ -19,6 +19,7 @@ typedef struct{
 
 Graph	randomGraph	(int, int);
 void	printGraph	(Graph);
+int		greedyColor	(Graph, int*);
 
 
 #endif

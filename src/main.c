@@ -110,6 +110,12 @@ int main(){
 	}
 	SDL_Quit();
 	
-	Graph gp = randomGraph(128, 40);
+	Graph gp = randomGraph(32768, 320);
 	printGraph(gp);
+	
+	int* colors = alloca(sizeof(int) * gp.nct);
+	int colorct = greedyColor(gp, colors);
+	printf("====%2i====\n", colorct);
+	for(int i   = 0; i < gp.nct; i++)
+		printf("%3i | %2i\n", i, colors[i]);
 }
