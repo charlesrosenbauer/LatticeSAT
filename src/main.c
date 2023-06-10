@@ -110,12 +110,17 @@ int main(){
 	}
 	SDL_Quit();
 	
-	Graph gp = randomGraph(1024, 320);
+	Graph gp = randomGraph(8192, 160);
 	printGraph(gp);
 	printf("Max clique: %i\n", cliqueBound(gp));
 	
 	int* colors = alloca(sizeof(int) * gp.nct);
 	int colorct = greedyColor(gp, colors);
+	printf("====%2i====\n", colorct);
+	for(int i   = 0; i < gp.nct; i++)
+		printf("%3i | %2i\n", i, colors[i]);
+	
+	colorct = greedySortColor(gp, colors);
 	printf("====%2i====\n", colorct);
 	for(int i   = 0; i < gp.nct; i++)
 		printf("%3i | %2i\n", i, colors[i]);
