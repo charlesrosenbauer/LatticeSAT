@@ -21,5 +21,7 @@ Graph	randomGraph	(int, int);
 void	printGraph	(Graph);
 int		greedyColor	(Graph, int*);
 
+int		cliqueBound	(Graph);
+
 
 #endif
