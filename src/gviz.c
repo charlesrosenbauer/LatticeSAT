@@ -8,6 +8,47 @@
 
 
 
+Graph makeSATGraph(Instance inst){
+	Graph ret;
+	ret.nct = inst.vct;
+	
+	ret.nodes = malloc(sizeof(int) * ret.nct);
+	for(int i = 0; i < ret.nct ; i++) ret.nodes[i] = 0;
+	for(int i = 0; i < inst.cct; i++){
+		int a = inst.cs[i].a;
+		int b = inst.cs[i].b;
+		int c = inst.cs[i].c;
+		a     = (a < 0)? -a : a;
+		b     = (b < 0)? -b : b;
+		c     = (c < 0)? -c : c;
+		a--;
+		b--;
+		c--;
+		ret.nodes[a]++;
+		ret.nodes[b]++;
+		ret.nodes[c]++;
+	}
+	int ect   = ret.nodes[0];
+	for(int i = 1; i < ret.nct ; i++){
+		ect  += ret.nodes[i];
+		ret.nodes[i] += ret.nodes[i-1];
+	}
+	for(int i = 0; i < ret.nct ; i++){
+		int a = inst.cs[i].a;
+		int b = inst.cs[i].b;
+		int c = inst.cs[i].c;
+		a     = (a < 0)? -a : a;
+		b     = (b < 0)? -b : b;
+		c     = (c < 0)? -c : c;
+		a--;
+		b--;
+		c--;
+		// TODO: figure out the best way to add these, this might require a rewrite with BloomLists
+	}
+
+	return ret;	
+}
+
 
 
 ColorTable makeCTab(int size, uint32_t def){
