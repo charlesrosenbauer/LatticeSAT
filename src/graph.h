@@ -4,6 +4,7 @@
 
 #include "stdint.h"
 
+#include "gutil.h"
 #include "util.h"
 
 
@@ -16,13 +17,28 @@ typedef struct{
 	int		nct, ect;
 }Graph;
 
+typedef struct{
+	uint32_t*	colors;
+	int			size;
+}ColorTable;
 
-Graph	randomGraph	(int, int);
-void	printGraph	(Graph);
-int		greedyColor	(Graph, int*);
-int		greedySortColor	(Graph, int*);
+typedef struct{
+	int*	table;
+	int		side;
+}GridTable;
 
-int		cliqueBound	(Graph);
+
+Graph		randomGraph		(int, int);
+void		printGraph		(Graph);
+int			greedyColor		(Graph, int*);
+int			greedySortColor	(Graph, int*);
+
+int			cliqueBound		(Graph);
+
+GridTable	makeGTab		(int);
+ColorTable	makeCTab		(int, uint32_t);
+void		drawGraphGrid	(Img, GridTable, Graph, ColorTable);
+
 
 
 #endif
