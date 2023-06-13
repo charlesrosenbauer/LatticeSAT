@@ -4,6 +4,7 @@
 
 #include "graph.h"
 #include "gutil.h"
+#include "util.h"
 #include "sat.h"
 
 
@@ -11,6 +12,9 @@
 Graph makeSATGraph(Instance inst){
 	Graph ret;
 	ret.nct = inst.vct;
+	
+	BloomList* blms = malloc(sizeof(BloomList) * ret.nct);
+	for(int i = 0; i < ret.nct; i++) blms[i] = makeBlmList(16);
 	
 	ret.nodes = malloc(sizeof(int) * ret.nct);
 	for(int i = 0; i < ret.nct ; i++) ret.nodes[i] = 0;
@@ -27,25 +31,30 @@ Graph makeSATGraph(Instance inst){
 		ret.nodes[a]++;
 		ret.nodes[b]++;
 		ret.nodes[c]++;
+		
+		appendBlmList(&blms[a], b);
+		appendBlmList(&blms[a], c);
+		appendBlmList(&blms[b], a);
+		appendBlmList(&blms[b], c);
+		appendBlmList(&blms[c], a);
+		appendBlmList(&blms[c], b);
 	}
-	int ect   = ret.nodes[0];
-	for(int i = 1; i < ret.nct ; i++){
-		ect  += ret.nodes[i];
-		ret.nodes[i] += ret.nodes[i-1];
-	}
-	for(int i = 0; i < ret.nct ; i++){
-		int a = inst.cs[i].a;
-		int b = inst.cs[i].b;
-		int c = inst.cs[i].c;
-		a     = (a < 0)? -a : a;
-		b     = (b < 0)? -b : b;
-		c     = (c < 0)? -c : c;
-		a--;
-		b--;
-		c--;
-		// TODO: figure out the best way to add these, this might require a rewrite with BloomLists
+	
+	int ect = 0;
+	for(int i = 0; i < ret.nct; i++) ect += blms[i].fill;
+	
+	ret.edges = malloc(sizeof(int) * ect);
+	int fill  = 0;
+	for(int i = 0; i < ret.nct; i++){
+		ret.nodes[i] = fill;
+		for(int j = 0; j < blms[i].fill; j++){
+			ret.edges[fill] = blms[i].xs[j];
+			fill++;
+		}
 	}
 
+	for(int i = 0; i < ret.nct; i++) free(blms[i].xs);
+	free(blms);
 	return ret;	
 }
 

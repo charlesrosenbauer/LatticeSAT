@@ -4,6 +4,7 @@
 
 #include "stdint.h"
 
+#include "sat.h"
 #include "gutil.h"
 #include "util.h"
 
@@ -39,6 +40,7 @@ GridTable	makeGTab		(int);
 ColorTable	makeCTab		(int, uint32_t);
 void		drawGrid		(Img, GridTable, ColorTable);
 void		moveGraph		(GridTable, Graph);
+Graph		makeSATGraph	(Instance);
 
 
 

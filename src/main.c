@@ -56,7 +56,8 @@ int main(){
 			}
 		}
 	}
-	
+	Graph sgp = makeSATGraph(sat);
+	moveGraph(gtab, sgp);
 	
 	
 	int n = sat.vct;
