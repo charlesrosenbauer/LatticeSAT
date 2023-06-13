@@ -50,12 +50,13 @@ int main(){
 			if(gtab.table[n] < 0){
 				gtab.table[n] = i;
 				int y = (n / 32) * 8;
-				ctab.colors[i] = (y * 256) + (256-y);
+				ctab.colors[i] = (y * 256) + (255-y);
 			}else{
 				i--;
 			}
 		}
 	}
+	
 	
 	
 	int n = sat.vct;
