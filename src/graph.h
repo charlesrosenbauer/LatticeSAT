@@ -37,7 +37,7 @@ int			cliqueBound		(Graph);
 
 GridTable	makeGTab		(int);
 ColorTable	makeCTab		(int, uint32_t);
-void		drawGraphGrid	(Img, GridTable, Graph, ColorTable);
+void		drawGrid		(Img, GridTable, ColorTable);
 
 
 

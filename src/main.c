@@ -39,6 +39,24 @@ int main(){
 	
 	PathSolver solv = initPathSolver(&dsat);
 	
+	ColorTable ctab = makeCTab(256, 0x0fff0f);
+	GridTable  gtab = makeGTab(5);
+	{
+		int size  = 1 << gtab.side;
+		size     *= size;
+		size--;
+		for(int i = 0; i < 256; i++){
+			int n = rng() & size;
+			if(gtab.table[n] < 0){
+				gtab.table[n] = i;
+				int y = (n / 32) * 8;
+				ctab.colors[i] = (y * 256) + (256-y);
+			}else{
+				i--;
+			}
+		}
+	}
+	
 	
 	int n = sat.vct;
 	{
@@ -74,26 +92,9 @@ int main(){
 			}
 		}
 		
-		uint32_t* pix = screen->pixels;
-		int ix = 0;
-		for(int i = 0; i < 512; i++){
-			for(int j = 0; j < 1024; j++){
-				if(j < 512){
-					int k = ((i/scale) * n) + (j/scale);
-					pix[ix] = (k < sat.vct)? ((sat.bits[k/64] & (1l << (k%64)))? 0xff0000 : 0xff) : 0;
-				}else{
-					pix[ix] = 0;
-				}
-				int dx = j-mx;
-				int dy = i-my;
-				if((dx*dx)+(dy*dy) < 53){
-					pix[ix] = 0x3f7f9f;
-				}
-				
-				ix++;
-			}
-		}
+		drawGrid(img, gtab, ctab);
 		
+		uint32_t* pix = screen->pixels;
 		for(int i = 524288; i < 655360; i++) pix[i] = 0x3f3f3f;
 		
 		for(int i = 0; i < bl.fill; i++) drawBox(pix, 512, 1024, bl.bs[i]);

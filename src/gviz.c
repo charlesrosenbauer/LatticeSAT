@@ -26,16 +26,16 @@ GridTable makeGTab(int side){
 }
 
 
-void drawGraphGrid(Img img, GridTable gtab, Graph g, ColorTable ctab){
+void drawGrid(Img img, GridTable gtab, ColorTable ctab){
 	int side  = 1l << gtab.side;
 	for(int i = 0; i < 512; i++){
-		int y = i *   (512 / side);
-		if( y <= img.h ){
+		int y = (i * side / 512);
+		if( i < img.h ){
 			for(int j = 0; j < 512; j++){
-				int x = j *   (512 / side);
-				int n = (i * side) + j;
-				int p = (y * img.w) + x;
-				if( x <= img.w ){
+				int x = (j * side / 512);
+				int n = (y * side ) + x;
+				int p = (i * img.w) + j;
+				if( j < img.w ){
 					int ix = gtab.table[n];
 					if((ix >= 0) && (ix < ctab.size)){
 						img.pixels[p] = ctab.colors[ix];
