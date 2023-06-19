@@ -41,23 +41,9 @@ int main(){
 	
 	ColorTable ctab = makeCTab(256, 0x0fff0f);
 	GridTable  gtab = makeGTab(5);
-	{
-		int size  = 1 << gtab.side;
-		size     *= size;
-		size--;
-		for(int i = 0; i < 256; i++){
-			int n = rng() & size;
-			if(gtab.table[n] < 0){
-				gtab.table[n] = i;
-				int y = (n / 32) * 8;
-				ctab.colors[i] = (y * 256) + (255-y);
-			}else{
-				i--;
-			}
-		}
-	}
+	
 	Graph sgp = makeSATGraph(sat);
-	moveGraph(gtab, sgp);
+	centerGraph(gtab, sgp, 0);
 	
 	
 	int n = sat.vct;
@@ -80,7 +66,14 @@ int main(){
 	int my   = 0;
 	int click= 0;
 	int cont = 1;
+	int time = 0;
 	while(cont){
+	
+		//if(!(time % 32)){
+		//	moveGraph(gtab, sgp);
+		//}
+		time++;
+		
 		click = 0;
 		SDL_Event e;
 		while(SDL_PollEvent(&e)){
@@ -98,33 +91,11 @@ int main(){
 		
 		uint32_t* pix = screen->pixels;
 		for(int i = 524288; i < 655360; i++) pix[i] = 0x3f3f3f;
-		
-		for(int i = 0; i < bl.fill; i++) drawBox(pix, 512, 1024, bl.bs[i]);
-		if(click){
-			int f = checkBox(bl, mx, my);
-			if (f) sprintf(msg, "%i\n", f);
-		}
-		
-		//printf("SAT=%i/%i\n", pathSolve(&solv, 100), dsat.cct);
-		drawText(img, font, msg, strlen(msg), 520, 16);
 	
 		SDL_Flip(screen);
 		SDL_Delay(30);
 	}
 	SDL_Quit();
 	
-	Graph gp = randomGraph(8192, 160);
-	printGraph(gp);
-	printf("Max clique: %i\n", cliqueBound(gp));
 	
-	int* colors = alloca(sizeof(int) * gp.nct);
-	int colorct = greedyColor(gp, colors);
-	printf("====%2i====\n", colorct);
-	for(int i   = 0; i < gp.nct; i++)
-		printf("%3i | %2i\n", i, colors[i]);
-	
-	colorct = greedySortColor(gp, colors);
-	printf("====%2i====\n", colorct);
-	for(int i   = 0; i < gp.nct; i++)
-		printf("%3i | %2i\n", i, colors[i]);
 }

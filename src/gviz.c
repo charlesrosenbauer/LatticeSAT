@@ -102,6 +102,94 @@ void drawGrid(Img img, GridTable gtab, ColorTable ctab){
 }
 
 
+
+void centerGraph(GridTable gtab, Graph g, int ix){
+	ix = (ix < 0)? 0 : (ix >= g.nct)? 0 : ix;
+	
+	int  fill  = 0;
+	int* table = malloc(sizeof(int) * g.nct);
+	for(int i  = 0; i < g.nct; i++) table[i] = -1;
+	
+	int side = 1l << gtab.side;
+	int x    = side/2;
+	int y    = side/2;
+	
+	for(int i = 0; i < (side*side); i++) gtab.table[i] = -1;
+	
+	IntQueue   q = makeQueue(g.nct);
+	IntQueue  xs = makeQueue(g.nct);
+	IntQueue  ys = makeQueue(g.nct);
+	
+	while(fill < g.nct){
+		pushQueue(&q , ix);
+		pushQueue(&xs, x );
+		pushQueue(&ys, y );
+		
+		while(popQueue(&q, &ix) >= 0){
+			popQueue(&q, &x);
+			popQueue(&q, &y);
+		
+			int tries= 0;
+			int cont = 1;
+			while(cont){
+				int dn = 0;
+				int dx, dy;
+				if(tries < 5){
+					printf("  [%i %i]\n", x, y);
+					dx = x + (rng() % 5) - 3;
+					dy = y + (rng() % 5) - 3;
+					dx = (dx < 0)? 0 : (dx >= side)? side-1 : dx;
+					dy = (dy < 0)? 0 : (dy >= side)? side-1 : dy;
+					dn = (dy * side) + dx;
+				}else{
+					dx = rng() % side;
+					dy = rng() % side;
+					dn = (dy * side) + dx;
+				}
+				if( gtab.table[dn] < 0){
+					gtab.table[dn] = ix;
+					table[ix]      = dn;
+					fill++;
+					cont = 0;
+					x = dx;
+					y = dy;
+					printf("%3i %3i %3i %3i\n", ix, dx, dy, side);
+				}else{
+					printf("  %3i %3i\n", dx, dy);
+				}
+				tries++;
+			}
+		
+			int here  = g.nodes[ix];
+			int last  = (ix+1 < g.nct)? g.nodes[ix+1] : g.ect;
+			for(int i = here; i < last; i++){
+				int n = g.edges[i];
+				if(table[n] < 0){
+					pushQueue(&q , n);
+					pushQueue(&xs, x);
+					pushQueue(&ys, y);
+				}
+			}
+		}
+		
+		if(fill < g.nct){
+			for(int i = 0; i < g.nct; i++){
+				if(table[i] < 0){
+					ix = i;
+					i  = g.nct;
+					x  = rng() % side;
+					y  = rng() % side;
+				}
+			}
+		}
+	}
+	
+	free(q .queue);
+	free(xs.queue);
+	free(ys.queue);
+}
+
+
 void moveGraph(GridTable gtab, Graph g){
 	int side  = 1l << gtab.side;
 	int size  = side * side;

@@ -40,6 +40,7 @@ GridTable	makeGTab		(int);
 ColorTable	makeCTab		(int, uint32_t);
 void		drawGrid		(Img, GridTable, ColorTable);
 void		moveGraph		(GridTable, Graph);
+void		centerGraph		(GridTable, Graph, int);
 Graph		makeSATGraph	(Instance);
 
 
