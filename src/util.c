@@ -39,7 +39,6 @@ int popQueue(IntQueue* q, int* x){
 		q->fill--;
 		return q->fill;
 	}
-	*x = 177;
 	return -1;
 }
 

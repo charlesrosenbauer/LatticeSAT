@@ -40,6 +40,7 @@ Graph makeSATGraph(Instance inst){
 		appendBlmList(&blms[c], b);
 	}
 	
+	// FIXME : the ret.ect=fill line below here duct-tapes this issue, but there somehow seems to be a bug with this calculation?
 	int ect = 0;
 	for(int i = 0; i < ret.nct; i++) ect += blms[i].fill;
 	
@@ -52,6 +53,7 @@ Graph makeSATGraph(Instance inst){
 			fill++;
 		}
 	}
+	ret.ect = fill;
 
 	for(int i = 0; i < ret.nct; i++) free(blms[i].xs);
 	free(blms);
@@ -126,8 +128,8 @@ void centerGraph(GridTable gtab, Graph g, int ix){
 		pushQueue(&ys, y );
 		
 		while(popQueue(&q, &ix) >= 0){
-			popQueue(&q, &x);
-			popQueue(&q, &y);
+			popQueue(&xs, &x);
+			popQueue(&ys, &y);
 		
 			int tries= 0;
 			int cont = 1;
@@ -135,9 +137,8 @@ void centerGraph(GridTable gtab, Graph g, int ix){
 				int dn = 0;
 				int dx, dy;
 				if(tries < 5){
-					printf("  [%i %i]\n", x, y);
-					dx = x + (rng() % 5) - 3;
-					dy = y + (rng() % 5) - 3;
+					dx = x + (rng() % 5) - 2;
+					dy = y + (rng() % 5) - 2;
 					dx = (dx < 0)? 0 : (dx >= side)? side-1 : dx;
 					dy = (dy < 0)? 0 : (dy >= side)? side-1 : dy;
 					dn = (dy * side) + dx;
@@ -149,13 +150,11 @@ void centerGraph(GridTable gtab, Graph g, int ix){
 				if( gtab.table[dn] < 0){
 					gtab.table[dn] = ix;
 					table[ix]      = dn;
-					fill++;
-					cont = 0;
 					x = dx;
 					y = dy;
-					printf("%3i %3i %3i %3i\n", ix, dx, dy, side);
-				}else{
-					printf("  %3i %3i\n", dx, dy);
+					
+					fill++;
+					cont = 0;
 				}
 				tries++;
 			}
@@ -164,10 +163,11 @@ void centerGraph(GridTable gtab, Graph g, int ix){
 			int last  = (ix+1 < g.nct)? g.nodes[ix+1] : g.ect;
 			for(int i = here; i < last; i++){
 				int n = g.edges[i];
-				if(table[n] < 0){
+				if(table[n] == -1){
 					pushQueue(&q , n);
 					pushQueue(&xs, x);
 					pushQueue(&ys, y);
+					table[n] = -2;
 				}
 			}
 		}
