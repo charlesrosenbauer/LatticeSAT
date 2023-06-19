@@ -5,6 +5,48 @@
 #include "util.h"
 
 
+
+
+
+
+IntQueue makeQueue(int size){
+	IntQueue ret;
+	ret.queue = malloc(sizeof(int) * size);
+	ret.head  = 0;
+	ret.fill  = 0;
+	ret.size  = size;
+	return ret;
+}
+
+
+int pushQueue(IntQueue* q, int x){
+	if(q->fill+1 < q->size){
+		int ix = q->head + q->fill;
+		ix    -= (ix >= q->size)? q->size : 0;
+		q->queue[ix] = x;
+		q->fill++;
+		return q->size-q->fill;
+	}
+	return 0;
+}
+
+
+int popQueue(IntQueue* q, int* x){
+	if(q->fill > 0){
+		*x = q->queue[q->head];
+		q->head++;
+		q->head -= (q->head >= q->size)? q->size : 0;
+		q->fill--;
+		return q->fill;
+	}
+	*x = 177;
+	return -1;
+}
+
+
+
+
+
 IntStack makeStack(int size){
 	IntStack ret;
 	ret.stk  = malloc(sizeof(int) * size);

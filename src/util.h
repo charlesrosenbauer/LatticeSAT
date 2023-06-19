@@ -6,6 +6,16 @@
 #include "stdlib.h"
 
 
+typedef struct{
+	int*		queue;
+	int			head, fill, size;
+}IntQueue;
+
+IntQueue	makeQueue		(int);
+int			pushQueue		(IntQueue*, int);
+int			popQueue		(IntQueue*, int*);
+
+
 
 typedef struct{
 	int*		stk;
