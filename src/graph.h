@@ -43,6 +43,7 @@ void		moveGraph		(GridTable, Graph);
 void		centerGraph		(GridTable, Graph, int);
 Graph		makeSATGraph	(Instance);
 
+void		colorCenterGraph(ColorTable, Graph, int);
 
 
 #endif

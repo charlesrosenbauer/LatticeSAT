@@ -104,6 +104,45 @@ void drawGrid(Img img, GridTable gtab, ColorTable ctab){
 }
 
 
+void colorCenterGraph(ColorTable ctab, Graph g, int ix){
+
+	for(int i = 0; i < g.nct; i++) ctab.colors[i] = 0;
+	ctab.colors[ix] = 1;
+	
+	int pass  =  0;
+	int fill  =  0;
+	int last  = -1;
+	while((fill  != last) && (fill < g.nct)){
+		last = fill;
+		for(int i = 0; i < g.nct; i++){
+			if(!fill){ i = ix; fill = 1; }
+		
+			if(ctab.colors[i] >= 0){
+				int here  = g.nodes[i];
+				int last  = (i+1 < g.nct)? g.nodes[i+1] : g.ect;
+				for(int j = here; j < last; j++){
+					int n = g.edges[j];
+					if(!ctab.colors[n]){
+						ctab.colors[n] = ctab.colors[i]+1;
+						fill++;
+					}
+				}
+			}
+		}
+		pass++;
+	}
+	
+	uint32_t max = 1;
+	for(int i = 0; i < g.nct; i++){
+		max = (ctab.colors[i] > max)? ctab.colors[i] : max;
+	}
+	uint32_t scale = 0xff00 / max;
+	for(int i = 0; i < g.nct; i++){
+		ctab.colors[i] = ((max-ctab.colors[i]) * scale) | 0xff;
+	}
+}
+
+
 
 void centerGraph(GridTable gtab, Graph g, int ix){
 	ix = (ix < 0)? 0 : (ix >= g.nct)? 0 : ix;
@@ -139,6 +178,12 @@ void centerGraph(GridTable gtab, Graph g, int ix){
 				if(tries < 5){
 					dx = x + (rng() % 5) - 2;
 					dy = y + (rng() % 5) - 2;
+					dx = (dx < 0)? 0 : (dx >= side)? side-1 : dx;
+					dy = (dy < 0)? 0 : (dy >= side)? side-1 : dy;
+					dn = (dy * side) + dx;
+				}else if(tries < 10){
+					dx = x + (rng() % 9) - 4;
+					dy = y + (rng() % 9) - 4;
 					dx = (dx < 0)? 0 : (dx >= side)? side-1 : dx;
 					dy = (dy < 0)? 0 : (dy >= side)? side-1 : dy;
 					dn = (dy * side) + dx;

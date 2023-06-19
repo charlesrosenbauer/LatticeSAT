@@ -43,7 +43,8 @@ int main(){
 	GridTable  gtab = makeGTab(5);
 	
 	Graph sgp = makeSATGraph(sat);
-	centerGraph(gtab, sgp, 121);
+	centerGraph(gtab, sgp, 64);
+	colorCenterGraph(ctab, sgp, 64);
 	
 	
 	int n = sat.vct;
