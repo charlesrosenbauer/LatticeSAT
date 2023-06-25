@@ -88,6 +88,14 @@ int main(){
 			}
 		}
 		
+		if(click && (mx < 512) && (my < 512)){
+			int side = 512 >> gtab.side;
+			int nx   = mx / side;
+			int ny   = my / side;
+			int n    = (ny * side) + nx;
+			printf("%3i %3i : %i\n", nx, ny, gtab.table[n]);
+		}
+		
 		drawGrid(img, gtab, ctab);
 		
 		uint32_t* pix = screen->pixels;
