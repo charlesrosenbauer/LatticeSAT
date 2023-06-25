@@ -90,10 +90,13 @@ int main(){
 		
 		if(click && (mx < 512) && (my < 512)){
 			int side = 512 >> gtab.side;
+			int isid = 1l  << gtab.side;
 			int nx   = mx / side;
 			int ny   = my / side;
-			int n    = (ny * side) + nx;
-			printf("%3i %3i : %i\n", nx, ny, gtab.table[n]);
+			int n    = (ny * isid) + nx;
+			int index= gtab.table[n];
+			printf("%3i %3i : %i\n", nx, ny, index);
+			if(index >= 0) colorCenterGraph(ctab, sgp, index);
 		}
 		
 		drawGrid(img, gtab, ctab);
